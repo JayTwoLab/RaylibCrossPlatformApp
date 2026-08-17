@@ -1,21 +1,21 @@
 #include "raylib-cpp.hpp"
 
 int main(int argc, char** argv) {
-    // 1. 화면 및 윈도우 초기화 (RAII 지원으로 소멸자에서 자동 종료)
+    // 1. Initialize screen and window (automatically closed in destructor thanks to RAII)
     const int screenWidth = 800;
     const int screenHeight = 450;
 
     raylib::Window window(screenWidth, screenHeight, "raylib-cpp example");
     SetTargetFPS(60);
 
-    // 2. 공의 상태값 설정
+    // 2. Set ball state values
     raylib::Vector2 ballPosition(screenWidth / 2.0f, screenHeight / 2.0f);
     raylib::Vector2 ballSpeed(5.0f, 4.0f);
     const float ballRadius = 24.0f;
 
-    // 3. 메인 게임 루프
+    // 3. Main game loop
     while (!window.ShouldClose()) {
-        // [업데이트] 공 위치 이동 및 벽면 충돌 처리
+        // [Update] Move ball position and handle wall collisions
         ballPosition += ballSpeed;
 
         if ((ballPosition.x >= (screenWidth - ballRadius)) || (ballPosition.x <= ballRadius)) {
@@ -25,11 +25,11 @@ int main(int argc, char** argv) {
             ballSpeed.y *= -1.0f;
         }
 
-        // [렌더링]
+        // [Rendering]
         BeginDrawing();
             window.ClearBackground(RAYWHITE);
 
-            // raylib-cpp 메서드를 활용한 드로잉
+            // Drawing using raylib-cpp methods
             ballPosition.DrawCircle(ballRadius, MAROON);
 
             raylib::DrawText("raylib-cpp example", 20, 20, 20, DARKGRAY);
