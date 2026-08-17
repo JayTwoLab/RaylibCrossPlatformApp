@@ -1,65 +1,43 @@
-#include "raylib.h"
+#include "raylib-cpp.hpp"
 
-int main(int argc, char** argv)
-{
-    // 1. Set screen resolution (desktop and mobile defaults)
+int main(int argc, char** argv) {
+    // 1. 화면 및 윈도우 초기화 (RAII 지원으로 소멸자에서 자동 종료)
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    // Configure mobile/desktop flags (allow window resizing)
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
-
-    InitWindow(screenWidth, screenHeight, "raylib Cross-Platform Test Application");
-
-    // 2. Set default target FPS (60 FPS)
+    raylib::Window window(screenWidth, screenHeight, "raylib-cpp example");
     SetTargetFPS(60);
 
-    // Initialize ball position
-    Vector2 ballPosition = { (float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2 };
-    Color ballColor = MAROON;
+    // 2. 공의 상태값 설정
+    raylib::Vector2 ballPosition(screenWidth / 2.0f, screenHeight / 2.0f);
+    raylib::Vector2 ballSpeed(5.0f, 4.0f);
+    const float ballRadius = 24.0f;
 
-    // -------------------------------------------------------------------------
-    // Main game loop (runs until window closes or ESC pressed)
-    // -------------------------------------------------------------------------
-    while (!WindowShouldClose())
-    {
-        // --- Update ---
-        
-        // Handle keyboard input
-        if (IsKeyDown(KEY_RIGHT)) ballPosition.x += 4.0f;
-        if (IsKeyDown(KEY_LEFT))  ballPosition.x -= 4.0f;
-        if (IsKeyDown(KEY_UP))    ballPosition.y -= 4.0f;
-        if (IsKeyDown(KEY_DOWN))  ballPosition.y += 4.0f;
+    // 3. 메인 게임 루프
+    while (!window.ShouldClose()) {
+        // [업데이트] 공 위치 이동 및 벽면 충돌 처리
+        ballPosition += ballSpeed;
 
-        // Handle mouse/touch input (common for mobile and desktop)
-        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) || GetTouchPointCount() > 0)
-        {
-            ballPosition = GetMousePosition();
+        if ((ballPosition.x >= (screenWidth - ballRadius)) || (ballPosition.x <= ballRadius)) {
+            ballSpeed.x *= -1.0f;
+        }
+        if ((ballPosition.y >= (screenHeight - ballRadius)) || (ballPosition.y <= ballRadius)) {
+            ballSpeed.y *= -1.0f;
         }
 
-        // --- Draw ---
+        // [렌더링]
         BeginDrawing();
+            window.ClearBackground(RAYWHITE);
 
-            ClearBackground(RAYWHITE);
+            // raylib-cpp 메서드를 활용한 드로잉
+            ballPosition.DrawCircle(ballRadius, MAROON);
 
-            // Text output test
-            DrawText("raylib Cross-Platform Test App", 20, 20, 20, DARKGRAY);
-            DrawText("Use ARROW KEYS or MOUSE/TOUCH to move the circle", 20, 50, 16, GRAY);
-
-            // Draw circle at input position
-            DrawCircleV(ballPosition, 30, ballColor);
-
-            // Draw FPS and screen resolution information
-            DrawText(TextFormat("FPS: %i", GetFPS()), 20, GetScreenHeight() - 40, 20, LIME);
-            DrawText(TextFormat("Screen: %dx%d", GetScreenWidth(), GetScreenHeight()), 120, GetScreenHeight() - 40, 20, DARKBLUE);
+            raylib::DrawText("raylib-cpp example", 20, 20, 20, DARKGRAY);
+            raylib::DrawText(std::string("FPS: ") + std::to_string(GetFPS()), 20, 50, 20, LIME);
+            raylib::DrawText("Press ESC to exit.", 20, screenHeight - 40, 18, LIGHTGRAY);
 
         EndDrawing();
     }
-
-    // -------------------------------------------------------------------------
-    // De-initialization
-    // -------------------------------------------------------------------------
-    CloseWindow(); // Close window and release OpenGL context
 
     return 0;
 }

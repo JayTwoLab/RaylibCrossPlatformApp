@@ -57,6 +57,8 @@ else()
     add_executable(${EXE_NAME} ${SOURCES})
 endif()
 
+target_include_directories(${EXE_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/raylib-cpp)
+
 target_link_libraries(${EXE_NAME} PRIVATE raylib)
 
 # ------------------------------------------------------------------------------
@@ -65,7 +67,7 @@ target_link_libraries(${EXE_NAME} PRIVATE raylib)
 
 # --- MSVC Compiler Specific Configurations ---
 if(MSVC)
-    target_compile_options(${EXE_NAME} PRIVATE /utf-8)
+    target_compile_options(${EXE_NAME} PRIVATE /utf-8 /wd4828)
     target_compile_definitions(${EXE_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS NOGDI)
     target_link_libraries(${EXE_NAME} PRIVATE winmm)
 endif()
