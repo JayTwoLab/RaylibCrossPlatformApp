@@ -45,9 +45,8 @@ Platform notes:
 - `CMakeLists.txt` — build configuration
 - `LICENSE` — project license
 
-## Bindary
-- Pre-built raylib libraty for MSVC 2022
-	- [raylib.zip](https://github.com/JayTwoLab/RaylibCrossPlatformApp/releases/download/v0.1.0/raylib.zip)
+## Binary
+- Pre-built raylib libraty for MSVC 2022 : [raylib.zip](https://github.com/JayTwoLab/RaylibCrossPlatformApp/releases/download/v0.1.0/raylib.zip)
  
 ## License
 See the `LICENSE` file at the repository root.
