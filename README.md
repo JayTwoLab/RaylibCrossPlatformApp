@@ -46,7 +46,8 @@ Platform notes:
 - `LICENSE` — project license
 
 ## Binary
-- Pre-built raylib libraty for MSVC 2022 : [raylib.zip](https://github.com/JayTwoLab/RaylibCrossPlatformApp/releases/download/v0.1.0/raylib.zip)
+- Pre-built raylib library
+   - [raylib 6.0](https://github.com/RobLoach/raylib-cpp/releases/tag/v6.0.0), MSVC 2022 : [raylib.zip](https://github.com/JayTwoLab/RaylibCrossPlatformApp/releases/download/v0.1.0/raylib.zip)
  
 ## License
 See the `LICENSE` file at the repository root.
