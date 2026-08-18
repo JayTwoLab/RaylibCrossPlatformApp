@@ -2,17 +2,17 @@
 
 A minimal cross-platform example using raylib demonstrating a resizable window, simple input handling (keyboard, mouse, touch), and basic rendering.
 
-**Features**
+## Features
 - **Resizable window**: The app uses a resizable window and reports current screen size.
 - **Input**: Move the circle with arrow keys, mouse, or touch input.
 - **Status overlay**: Shows FPS and current screen resolution.
 
-**Requirements**
+## Requirements
 - CMake 3.24 or newer
 - A C/C++ compiler supporting C++17 (MSVC, clang, gcc)
 - raylib library installed and findable by CMake
 
-**Build (basic)**
+## Build (basic)
 1. Create a build directory and run CMake:
 
 ```bash
@@ -28,25 +28,26 @@ Platform notes:
 - macOS: You can build with Xcode or a Unix-style generator; the CMake file has basic Apple bundle settings for iOS/macOS.
 - Linux: Ensure `Threads` and common system libraries are available; the CMake script links `m` and `dl` where needed.
 
-**Run**
+## Run
 - Run the generated executable from the build output. Example on Unix-like systems:
 
 ```bash
 ./MyRaylibApp
 ```
 
-**Controls**
+## Controls
 - Arrow keys: move the circle
 - Mouse / touch: click or touch to move the circle to pointer position
 - Esc or close window: exit
 
-**Project layout**
+## Project layout
 - `src/main.cpp` — main application source
 - `CMakeLists.txt` — build configuration
 - `LICENSE` — project license
 
-**Contributing**
-Contributions and improvements are welcome. Open an issue or a pull request with proposed changes.
-
-**License**
+## Bindary
+- Pre-built raylib libraty for MSVC 2022
+	- [raylib.zip](https://github.com/JayTwoLab/RaylibCrossPlatformApp/releases/download/v0.1.0/raylib.zip)
+ 
+## License
 See the `LICENSE` file at the repository root.
