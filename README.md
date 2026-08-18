@@ -1,6 +1,6 @@
 # Raylib Cross-Platform Test Application
 
-A minimal cross-platform example using raylib demonstrating a resizable window, simple input handling (keyboard, mouse, touch), and basic rendering.
+- A minimal cross-platform example using [raylib](https://github.com/raysan5/raylib) demonstrating a resizable window, simple input handling (keyboard, mouse, touch), and basic rendering.
 
 ## Features
 - **Resizable window**: The app uses a resizable window and reports current screen size.
