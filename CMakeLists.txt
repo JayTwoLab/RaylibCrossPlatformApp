@@ -30,8 +30,8 @@ set(EXE_NAME "MyRaylibApp")
 # ------------------------------------------------------------------------------
 # Search primarily the src folder to avoid including files inside build directories (out, build).
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/module/Engine/*.cpp"
 )
 
 # If you want to include sources from the root path, it's safer to register them explicitly as follows.
@@ -57,7 +57,10 @@ else()
     add_executable(${EXE_NAME} ${SOURCES})
 endif()
 
-target_include_directories(${EXE_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/raylib-cpp)
+target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/raylib-cpp")
+target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/module")
 
 target_link_libraries(${EXE_NAME} PRIVATE raylib)
 

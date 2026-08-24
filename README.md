@@ -48,6 +48,43 @@ Platform notes:
 ## Binary
 - Pre-built raylib library
    - [raylib 6.0](https://github.com/RobLoach/raylib-cpp/releases/tag/v6.0.0), MSVC 2022 : [raylib.zip](https://github.com/JayTwoLab/RaylibCrossPlatformApp/releases/download/v0.1.0/raylib.zip)
- 
+   - Set `raylib_DIR` in `CMakeSettings.json`
+```json
+{
+  "configurations": [
+    {
+      "name": "x64-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "variables": [
+        {
+          "name": "raylib_DIR",
+          "value": "C:/raylib/lib/cmake/raylib",
+          "type": "PATH"
+        }
+      ]
+    },
+    {
+      "name": "x64-Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "variables": [
+        {
+          "name": "raylib_DIR",
+          "value": "C:/raylib/lib/cmake/raylib",
+          "type": "PATH"
+        }
+      ]
+    }
+  ]
+}
+```
+
 ## License
-See the `LICENSE` file at the repository root.
+See the [`LICENSE`](LICENSE) file at the repository root.

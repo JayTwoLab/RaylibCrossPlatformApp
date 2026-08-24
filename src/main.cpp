@@ -1,42 +1,75 @@
 #include "raylib-cpp.hpp"
+#include <algorithm>
 
-int main(int argc, char** argv) {
-    // 1. Initialize screen and window (automatically closed in destructor thanks to RAII)
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+#include "Engine/Engine.hpp"
 
-    raylib::Window window(screenWidth, screenHeight, "raylib-cpp example");
+#include "TitleScene.hpp"
+#include "GameplayScene.hpp"
+#include "GameOverScene.hpp"
+#include "StageClearScene.hpp"
+
+int main() {
+    namespace ED = Engine::Display;
+    using EDD = Engine::Display::Display;
+
+    EDD::Instance().VirtualWidth  = 800;
+	EDD::Instance().VirtualHeight = 600;
+
+	const int virtualScreenWidth = EDD::Instance().VirtualWidth;
+	const int virtualScreenHeight = EDD::Instance().VirtualHeight;
+
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
+
+    raylib::Window window(virtualScreenWidth, virtualScreenHeight, "Raylib-CPP Scalable App");
     SetTargetFPS(60);
 
-    // 2. Set ball state values
-    raylib::Vector2 ballPosition(screenWidth / 2.0f, screenHeight / 2.0f);
-    raylib::Vector2 ballSpeed(5.0f, 4.0f);
-    const float ballRadius = 24.0f;
+    raylib::RenderTexture2D target(virtualScreenWidth, virtualScreenHeight);
+    SetTextureFilter(target.GetTexture(), TEXTURE_FILTER_BILINEAR);
 
-    // 3. Main game loop
+    Engine::Scene::SceneManager sceneManager;
+
+    sceneManager.RegisterScene<TitleScene>("Title");
+    sceneManager.RegisterScene<GameplayScene>("Gameplay");
+    sceneManager.RegisterScene<GameOverScene>("GameOver");
+    sceneManager.RegisterScene<StageClearScene>("StageClear");
+
+    sceneManager.ChangeScene("Title");
+
     while (!window.ShouldClose()) {
-        // [Update] Move ball position and handle wall collisions
-        ballPosition += ballSpeed;
+        int screenWidth = GetScreenWidth();
+        int screenHeight = GetScreenHeight();
 
-        if ((ballPosition.x >= (screenWidth - ballRadius)) || (ballPosition.x <= ballRadius)) {
-            ballSpeed.x *= -1.0f;
-        }
-        if ((ballPosition.y >= (screenHeight - ballRadius)) || (ballPosition.y <= ballRadius)) {
-            ballSpeed.y *= -1.0f;
-        }
+        auto scaleX = (float)screenWidth / (float)virtualScreenWidth;
+		auto scaleY = (float)screenHeight / (float)virtualScreenHeight;
+        float scale = std::min(scaleX, scaleY);
 
-        // [Rendering]
-        BeginDrawing();
-            window.ClearBackground(RAYWHITE);
+        // 씬 로직 업데이트 (ClickableAreaManager 내부에서 보정 좌표 자동 사용)
+        sceneManager.Update();
 
-            // Drawing using raylib-cpp methods
-            ballPosition.DrawCircle(ballRadius, MAROON);
+        // 가상 렌더 텍스처에 그리기
+        target.BeginMode();
+        sceneManager.Draw();
+        target.EndMode();
 
-            raylib::DrawText("raylib-cpp example", 20, 20, 20, DARKGRAY);
-            raylib::DrawText(std::string("FPS: ") + std::to_string(GetFPS()), 20, 50, 20, LIME);
-            raylib::DrawText("Press ESC to exit.", 20, screenHeight - 40, 18, LIGHTGRAY);
+        // 레터박스 적용 후 화면에 렌더링
+        window.BeginDrawing();
+        raylib::Color::Black().ClearBackground();
 
-        EndDrawing();
+        raylib::Rectangle srcRect = {
+            0.0f, 0.0f,
+            (float)target.GetTexture().width,
+            -(float)target.GetTexture().height
+        };
+
+        raylib::Rectangle destRect = {
+            (screenWidth - (virtualScreenWidth * scale)) * 0.5f,
+            (screenHeight - (virtualScreenHeight * scale)) * 0.5f,
+            virtualScreenWidth * scale,
+            virtualScreenHeight * scale
+        };
+
+        target.GetTexture().Draw(srcRect, destRect, raylib::Vector2{ 0, 0 }, 0.0f, raylib::Color::White());
+        window.EndDrawing();
     }
 
     return 0;
