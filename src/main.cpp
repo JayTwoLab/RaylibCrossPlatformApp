@@ -11,21 +11,22 @@
 int main() {
 
 #ifdef NDEBUG
-    // ¸±¸®Áî ¸ğµå: Ä¡¸íÀûÀÎ ¿¡·¯¸¸ Ãâ·ÂÇÏ°Å³ª ¾Æ¿¹ ²û
-    SetTraceLogLevel(LOG_FATAL); // ¶Ç´Â LOG_NONE
+    // ë¦´ë¦¬ì¦ˆ ëª¨ë“œ: ì¹˜ëª…ì ì¸ ì—ëŸ¬ë§Œ ì¶œë ¥í•˜ê±°ë‚˜ ì•„ì˜ˆ ë”
+    SetTraceLogLevel(LOG_FATAL); // ë˜ëŠ” LOG_NONE
 #else
-    // µğ¹ö±× ¸ğµå: ¸ğµç Á¤º¸/°æ°í/¿¡·¯ Ãâ·Â
-    SetTraceLogLevel(LOG_ALL);   // ¶Ç´Â LOG_INFO
+    // ë””ë²„ê·¸ ëª¨ë“œ: ëª¨ë“  ì •ë³´/ê²½ê³ /ì—ëŸ¬ ì¶œë ¥
+    SetTraceLogLevel(LOG_ALL);   // ë˜ëŠ” LOG_INFO
 #endif
 
     namespace ED = Engine::Display;
     using EDD = Engine::Display::Display;
+    auto& display = EDD::Instance();
 
-    EDD::Instance().VirtualWidth  = 800;
-	EDD::Instance().VirtualHeight = 600;
+    display.VirtualWidth  = 800;
+	display.VirtualHeight = 600;
 
-	const int virtualScreenWidth = EDD::Instance().VirtualWidth;
-	const int virtualScreenHeight = EDD::Instance().VirtualHeight;
+	const int virtualScreenWidth = display.VirtualWidth;
+	const int virtualScreenHeight = display.VirtualHeight;
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
 
@@ -52,32 +53,37 @@ int main() {
 		auto scaleY = (float)screenHeight / (float)virtualScreenHeight;
         float scale = std::min(scaleX, scaleY);
 
-        // ¾À ·ÎÁ÷ ¾÷µ¥ÀÌÆ® (ClickableAreaManager ³»ºÎ¿¡¼­ º¸Á¤ ÁÂÇ¥ ÀÚµ¿ »ç¿ë)
+        // ì”¬ ë¡œì§ ì—…ë°ì´íŠ¸ (ClickableAreaManager ë‚´ë¶€ì—ì„œ ë³´ì • ì¢Œí‘œ ìë™ ì‚¬ìš©)
         sceneManager.Update();
 
-        // °¡»ó ·»´õ ÅØ½ºÃ³¿¡ ±×¸®±â
+        // ê°€ìƒ ë Œë” í…ìŠ¤ì²˜ì— ê·¸ë¦¬ê¸°
         target.BeginMode();
-        sceneManager.Draw();
+            sceneManager.Draw();
         target.EndMode();
 
-        // ·¹ÅÍ¹Ú½º Àû¿ë ÈÄ È­¸é¿¡ ·»´õ¸µ
+        // ë ˆí„°ë°•ìŠ¤ ì ìš© í›„ í™”ë©´ì— ë Œë”ë§
         window.BeginDrawing();
-        raylib::Color::Black().ClearBackground();
+            raylib::Color::Black().ClearBackground();
 
-        raylib::Rectangle srcRect = {
-            0.0f, 0.0f,
-            (float)target.GetTexture().width,
-            -(float)target.GetTexture().height
-        };
+            raylib::Rectangle srcRect = {
+                0.0f, // Left
+                0.0f, // Top
+                (float)target.GetTexture().width, // Right
+                -(float)target.GetTexture().height // Bottom (negative to flip vertically)
+            };
 
-        raylib::Rectangle destRect = {
-            (screenWidth - (virtualScreenWidth * scale)) * 0.5f,
-            (screenHeight - (virtualScreenHeight * scale)) * 0.5f,
-            virtualScreenWidth * scale,
-            virtualScreenHeight * scale
-        };
+            raylib::Rectangle destRect = {
+                (screenWidth - (virtualScreenWidth * scale)) * 0.5f, // Center horizontally
+                (screenHeight - (virtualScreenHeight * scale)) * 0.5f, // Center vertically
+                virtualScreenWidth* scale, // Width scaled
+                virtualScreenHeight* scale // Height scaled
+            };
 
-        target.GetTexture().Draw(srcRect, destRect, raylib::Vector2{ 0, 0 }, 0.0f, raylib::Color::White());
+            auto origin_draw = raylib::Vector2{ 0, 0 };
+            auto rotation_draw = 0.0f;
+            auto tint_draw = raylib::Color::White();
+            target.GetTexture().Draw(srcRect, destRect, origin_draw, rotation_draw, tint_draw);
+
         window.EndDrawing();
     }
 
