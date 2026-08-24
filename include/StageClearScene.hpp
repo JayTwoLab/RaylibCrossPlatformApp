@@ -11,7 +11,7 @@ private:
 
 public:
     StageClearScene();
-
+     
     void Init() override;
     void Update() override;
     void Draw() override;

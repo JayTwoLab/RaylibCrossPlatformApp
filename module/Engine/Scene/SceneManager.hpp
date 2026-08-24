@@ -19,7 +19,7 @@ namespace Engine {
             template <typename T>
             void RegisterScene(const std::string& name) {
                 sceneFactories[name] = []() { return std::make_unique<T>(); };
-            }
+            } 
 
             void ChangeScene(const std::string& name);
             void Update();

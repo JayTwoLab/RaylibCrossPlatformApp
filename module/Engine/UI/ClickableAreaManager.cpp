@@ -12,8 +12,8 @@ namespace Engine {
             regions.clear();
         }
 
-        void ClickableAreaManager::Update() {
-            // ½ÇÁ¦ Ã¢ ÇØ»óµµ ´ë½Å °¡»ó Äµ¹ö½º(800x450) ±âÁØ º¸Á¤µÈ ¸¶¿ì½º ÁÂÇ¥ »ç¿ë
+        void ClickableAreaManager::Update() { 
+            // ì‹¤ì œ ì°½ í•´ìƒë„ ëŒ€ì‹  ê°€ìƒ ìº”ë²„ìŠ¤(800x450) ê¸°ì¤€ ë³´ì •ëœ ë§ˆìš°ìŠ¤ ì¢Œí‘œ ì‚¬ìš©
 
 			namespace ED = Engine::Display;
 			using EDD = Engine::Display::Display;

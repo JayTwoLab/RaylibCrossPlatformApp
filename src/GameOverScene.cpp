@@ -15,7 +15,7 @@ void GameOverScene::Init() {
         });
 }
 
-void GameOverScene::Update() {
+void GameOverScene::Update() { 
     clickManager.Update();
 }
 

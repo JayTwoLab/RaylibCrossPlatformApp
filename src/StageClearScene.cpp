@@ -13,7 +13,7 @@ void StageClearScene::Init() {
 
 void StageClearScene::Update() {
     clickManager.Update();
-}
+} 
 
 void StageClearScene::Draw() {
     raylib::Color::DarkGreen().ClearBackground();

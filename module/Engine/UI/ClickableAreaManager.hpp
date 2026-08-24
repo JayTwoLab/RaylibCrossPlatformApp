@@ -15,7 +15,7 @@ namespace Engine {
             bool isHovered;
         };
 
-        class ClickableAreaManager {
+        class ClickableAreaManager { 
         private:
             std::vector<ClickableRegion> regions;
 

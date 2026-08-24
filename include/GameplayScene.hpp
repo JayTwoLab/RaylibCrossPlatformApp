@@ -15,7 +15,7 @@ private:
     void ResetFields();
 
 public:
-    GameplayScene();
+    GameplayScene(); 
 
     void Init() override;
     void Update() override;

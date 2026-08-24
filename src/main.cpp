@@ -9,6 +9,15 @@
 #include "StageClearScene.hpp"
 
 int main() {
+
+#ifdef NDEBUG
+    // 릴리즈 모드: 치명적인 에러만 출력하거나 아예 끔
+    SetTraceLogLevel(LOG_FATAL); // 또는 LOG_NONE
+#else
+    // 디버그 모드: 모든 정보/경고/에러 출력
+    SetTraceLogLevel(LOG_ALL);   // 또는 LOG_INFO
+#endif
+
     namespace ED = Engine::Display;
     using EDD = Engine::Display::Display;
 

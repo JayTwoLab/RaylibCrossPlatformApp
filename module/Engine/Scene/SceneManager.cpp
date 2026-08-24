@@ -16,7 +16,7 @@ namespace Engine {
                 currentScene->Unload();
             }
 
-            currentScene = it->second();
+            currentScene = it->second(); 
             currentScene->Init();
         }
 

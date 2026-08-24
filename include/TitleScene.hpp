@@ -9,17 +9,17 @@ private:
     Engine::UI::ClickableAreaManager clickManager;
     int soundVolume = 50;
 
-    // Å¬¸¯ ÁÂÇ¥ ÀúÀå º¯¼ö
+    // í´ë¦­ ì¢Œí‘œ ì €ì¥ ë³€ìˆ˜
     raylib::Vector2 lastClickedPos = { -1.0f, -1.0f };
     // bool hasClicked = false;
 
-    // µå·¡±× °ü·Ã º¯¼ö
-    raylib::Rectangle dragBox = { 100, 100, 120, 80 }; // µå·¡±×ÇÒ ¹Ú½º
-    bool isDragging = false;                           // µå·¡±× »óÅÂ ÇÃ·¡±×
-    raylib::Vector2 dragOffset = { 0.0f, 0.0f };       // ¸¶¿ì½º Å¬¸¯ ¿ÀÇÁ¼Â
+    // ë“œë˜ê·¸ ê´€ë ¨ ë³€ìˆ˜
+    raylib::Rectangle dragBox = { 100, 100, 120, 80 }; // ë“œë˜ê·¸í•  ë°•ìŠ¤
+    bool isDragging = false;                           // ë“œë˜ê·¸ ìƒíƒœ í”Œë˜ê·¸
+    raylib::Vector2 dragOffset = { 0.0f, 0.0f };       // ë§ˆìš°ìŠ¤ í´ë¦­ ì˜¤í”„ì…‹
 
 public:
-    TitleScene();
+    TitleScene(); 
 
     void Init() override;
     void Update() override;

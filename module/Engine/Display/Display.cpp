@@ -12,7 +12,7 @@ namespace Engine {
 
             int screenWidth = GetScreenWidth();
             int screenHeight = GetScreenHeight();
-
+             
 			int VirtualWidth = Display::Instance().VirtualWidth;
 			int VirtualHeight = Display::Instance().VirtualHeight;
 

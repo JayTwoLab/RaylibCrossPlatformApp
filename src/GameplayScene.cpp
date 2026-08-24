@@ -13,7 +13,7 @@ void GameplayScene::ResetFields() {
 
 void GameplayScene::Init() {
     ResetFields();
-
+     
     clickManager.Clear();
 
     clickManager.AddRegion("hit_area", raylib::Rectangle{ 50, 350, 150, 40 }, [this]() {

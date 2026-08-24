@@ -20,7 +20,7 @@ namespace Engine {
 
             int VirtualWidth;
             int VirtualHeight;
-
+             
             raylib::Vector2 GetVirtualMousePosition();
 
         private:

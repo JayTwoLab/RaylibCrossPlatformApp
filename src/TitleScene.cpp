@@ -17,8 +17,8 @@ void TitleScene::Init() {
     nextScene = "";
     clickManager.Clear();
 
-    // µå·¡±× ¹Ú½º ÃÊ±âÈ­
-    dragBox = { 100, 100, 120, 80 };
+    // ë“œë˜ê·¸ ë°•ìŠ¤ ì´ˆê¸°í™”
+    dragBox = { 100, 100, 120, 80 }; 
     isDragging = false;
 
     clickManager.AddRegion("start_button", raylib::Rectangle{ 300, 180, 200, 50 }, [this]() {
@@ -39,10 +39,10 @@ void TitleScene::Update() {
 
     //-----------------------------
 
-    // ¸ÖÆ¼ ÅÍÄ¡ Ã³¸® ±âº» ÆĞÅÏ
+    // ë©€í‹° í„°ì¹˜ ì²˜ë¦¬ ê¸°ë³¸ íŒ¨í„´
     // int touchCount = GetTouchPointCount();
     // if (touchCount >= 2) {
-    //     // µÎ ¼Õ°¡¶ô ÀÌ»ó ÅÍÄ¡ ½Ã, µå·¡±× ¹Ú½º ÃÊ±âÈ­
+    //     // ë‘ ì†ê°€ë½ ì´ìƒ í„°ì¹˜ ì‹œ, ë“œë˜ê·¸ ë°•ìŠ¤ ì´ˆê¸°í™”
 	// }
 
     namespace ED = Engine::Display;
@@ -51,7 +51,7 @@ void TitleScene::Update() {
 
     raylib::Vector2 mousePos = display.GetVirtualMousePosition();
 
-    // 1. µå·¡±× ½ÃÀÛ (ÁÂÅ¬¸¯À» ´©¸¥ ¼ø°£)
+    // 1. ë“œë˜ê·¸ ì‹œì‘ (ì¢Œí´ë¦­ì„ ëˆ„ë¥¸ ìˆœê°„)
     if (raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_LEFT)) {
         if (dragBox.CheckCollision(mousePos)) {
             isDragging = true;
@@ -62,38 +62,38 @@ void TitleScene::Update() {
         lastClickedPos = mousePos;
         // hasClicked = true;
 
-        // ÄÜ¼Ö Ãâ·Â (µğ¹ö±ë¿ë)
+        // ì½˜ì†” ì¶œë ¥ (ë””ë²„ê¹…ìš©)
         TraceLog(LOG_INFO, "L-Clicked Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
     }
 
-    // 2. µå·¡±× Áß (ÁÂÅ¬¸¯ À¯Áö Áß)
+    // 2. ë“œë˜ê·¸ ì¤‘ (ì¢Œí´ë¦­ ìœ ì§€ ì¤‘)
     if (isDragging && raylib::Mouse::IsButtonDown(MOUSE_BUTTON_LEFT)) {
         dragBox.x = mousePos.x - dragOffset.x;
         dragBox.y = mousePos.y - dragOffset.y;
 
-        // ÄÜ¼Ö Ãâ·Â (µğ¹ö±ë¿ë)
+        // ì½˜ì†” ì¶œë ¥ (ë””ë²„ê¹…ìš©)
         TraceLog(LOG_INFO, "DragBox Position: (%.1f, %.1f)", dragBox.x, dragBox.y);
     }
 
-    // 3. µå·¡±× Á¾·á (ÁÂÅ¬¸¯ ÇØÁ¦)
+    // 3. ë“œë˜ê·¸ ì¢…ë£Œ (ì¢Œí´ë¦­ í•´ì œ)
     if (raylib::Mouse::IsButtonReleased(MOUSE_BUTTON_LEFT)) {
         isDragging = false;
 
-        // ÄÜ¼Ö Ãâ·Â (µğ¹ö±ë¿ë)
+        // ì½˜ì†” ì¶œë ¥ (ë””ë²„ê¹…ìš©)
         TraceLog(LOG_INFO, "L-Released Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
     }
 
-    // ¿ìÅ¬¸¯ ½Ã (¾Èµå·ÎÀÌµå ÅÍÄ¡ ½ºÅ©¸°¿¡¼­´Â ¿ìÅ¬¸¯ ¾øÀ½)   
+    // ìš°í´ë¦­ ì‹œ (ì•ˆë“œë¡œì´ë“œ í„°ì¹˜ ìŠ¤í¬ë¦°ì—ì„œëŠ” ìš°í´ë¦­ ì—†ìŒ)   
     if (raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_RIGHT)) {
         // hasClicked = false;
 
-        // ÄÜ¼Ö Ãâ·Â (µğ¹ö±ë¿ë)
+        // ì½˜ì†” ì¶œë ¥ (ë””ë²„ê¹…ìš©)
         TraceLog(LOG_INFO, "R-Clicked Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
     }
 
-	// ¿ìÅ¬¸¯ ÇØÁ¦ ½Ã
+	// ìš°í´ë¦­ í•´ì œ ì‹œ
     if (raylib::Mouse::IsButtonReleased(MOUSE_BUTTON_RIGHT)) {
-        // ÄÜ¼Ö Ãâ·Â (µğ¹ö±ë¿ë)
+        // ì½˜ì†” ì¶œë ¥ (ë””ë²„ê¹…ìš©)
         TraceLog(LOG_INFO, "R-Released Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
     }
 }
@@ -102,12 +102,12 @@ void TitleScene::Draw() {
     raylib::Color::RayWhite().ClearBackground();
     raylib::DrawText("MAIN MENU", 320, 100, 32, raylib::Color::DarkBlue());
 
-    // µå·¡±× ¹Ú½º ·»´õ¸µ
+    // ë“œë˜ê·¸ ë°•ìŠ¤ ë Œë”ë§
     raylib::Color boxColor = isDragging ? raylib::Color::Orange() : raylib::Color::Purple();
     dragBox.Draw(boxColor);
     raylib::DrawText("Drag Me!", (int)dragBox.x + 20, (int)dragBox.y + 30, 20, raylib::Color::White());
 
-    // ¹öÆ° ·»´õ¸µ
+    // ë²„íŠ¼ ë Œë”ë§
     raylib::Rectangle(300, 180, 200, 50).Draw(raylib::Color::SkyBlue());
     raylib::DrawText("START GAME", 335, 195, 20, raylib::Color::DarkBlue());
 
