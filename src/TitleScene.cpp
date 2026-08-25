@@ -9,10 +9,10 @@ void TitleScene::Init() {
     using EDD = Engine::Display::Display;
     auto& display = EDD::Instance();
 
-    const int virtualScreenWidth = display.VirtualWidth;
-    assert(virtualScreenWidth >= 800);
-    const int virtualScreenHeight = display.VirtualHeight;
-    assert(virtualScreenHeight >= 600);
+    // const int virtualScreenWidth = display.VirtualWidth;
+    // assert(virtualScreenWidth >= 800);
+    // const int virtualScreenHeight = display.VirtualHeight;
+    // assert(virtualScreenHeight >= 600);
 
     nextScene = "";
     clickManager.Clear();
@@ -21,6 +21,7 @@ void TitleScene::Init() {
     dragBox = { 100, 100, 120, 80 }; 
     isDragging = false;
 
+    // 버튼 클릭 영역 등록
     clickManager.AddRegion("start_button", raylib::Rectangle{ 300, 180, 200, 50 }, [this]() {
         this->nextScene = "Gameplay";
         });
@@ -39,7 +40,7 @@ void TitleScene::Update() {
 
     //-----------------------------
 
-    // 멀티 터치 처리 기본 패턴
+    // 멀티 터치 처리 기본 패턴 (안드로이드 등)
     // int touchCount = GetTouchPointCount();
     // if (touchCount >= 2) {
     //     // 두 손가락 이상 터치 시, 드래그 박스 초기화
@@ -49,9 +50,10 @@ void TitleScene::Update() {
     using EDD = Engine::Display::Display;
     auto& display = EDD::Instance();
 
+    // 마우스 위치를 가상 좌표로 변환    
     raylib::Vector2 mousePos = display.GetVirtualMousePosition();
 
-    // 1. 드래그 시작 (좌클릭을 누른 순간)
+    // 좌 클릭
     if (raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_LEFT)) {
         if (dragBox.CheckCollision(mousePos)) {
             isDragging = true;
@@ -60,13 +62,12 @@ void TitleScene::Update() {
         }
 
         lastClickedPos = mousePos;
-        // hasClicked = true;
 
         // 콘솔 출력 (디버깅용)
         TraceLog(LOG_INFO, "L-Clicked Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
     }
 
-    // 2. 드래그 중 (좌클릭 유지 중)
+    // 좌 클릭 유지 중
     if (isDragging && raylib::Mouse::IsButtonDown(MOUSE_BUTTON_LEFT)) {
         dragBox.x = mousePos.x - dragOffset.x;
         dragBox.y = mousePos.y - dragOffset.y;
@@ -75,7 +76,7 @@ void TitleScene::Update() {
         TraceLog(LOG_INFO, "DragBox Position: (%.1f, %.1f)", dragBox.x, dragBox.y);
     }
 
-    // 3. 드래그 종료 (좌클릭 해제)
+    // 좌 클릭 해제
     if (raylib::Mouse::IsButtonReleased(MOUSE_BUTTON_LEFT)) {
         isDragging = false;
 
@@ -83,15 +84,14 @@ void TitleScene::Update() {
         TraceLog(LOG_INFO, "L-Released Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
     }
 
-    // 우클릭 시 (안드로이드 터치 스크린에서는 우클릭 없음)   
+    // 우 클릭 시 (안드로이드 터치 스크린에서는 우클릭 없음)   
     if (raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_RIGHT)) {
-        // hasClicked = false;
 
         // 콘솔 출력 (디버깅용)
         TraceLog(LOG_INFO, "R-Clicked Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
     }
 
-	// 우클릭 해제 시
+	// 우 클릭 해제 시 (안드로이드 터치 스크린에서는 우클릭 없음) 
     if (raylib::Mouse::IsButtonReleased(MOUSE_BUTTON_RIGHT)) {
         // 콘솔 출력 (디버깅용)
         TraceLog(LOG_INFO, "R-Released Position: (%.1f, %.1f)", mousePos.x, mousePos.y);

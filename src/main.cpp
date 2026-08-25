@@ -1,12 +1,13 @@
-#include "raylib-cpp.hpp"
 #include <algorithm>
-
-#include "Engine/Engine.hpp"
+#include "raylib-cpp.hpp" // raylib-cpp 
+#include "Engine/Engine.hpp" // module
 
 #include "TitleScene.hpp"
 #include "GameplayScene.hpp"
 #include "GameOverScene.hpp"
 #include "StageClearScene.hpp"
+
+#include "GenerateTestAssets.hpp"
 
 int main() {
 
@@ -19,49 +20,62 @@ int main() {
 #endif
 
     namespace ED = Engine::Display;
+    namespace ES = Engine::Scene;
+    namespace EU = Engine::UI;
     using EDD = Engine::Display::Display;
     auto& display = EDD::Instance();
 
+    // 가상 화면 크기 설정
     display.VirtualWidth  = 800;
 	display.VirtualHeight = 600;
 
 	const int virtualScreenWidth = display.VirtualWidth;
 	const int virtualScreenHeight = display.VirtualHeight;
 
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
+    auto configFlags =
+        FLAG_WINDOW_RESIZABLE | // 윈도우 크기 조절 가능
+        FLAG_VSYNC_HINT; // 수직 동기화 활성화
+    SetConfigFlags(configFlags);
 
-    raylib::Window window(virtualScreenWidth, virtualScreenHeight, "Raylib-CPP Scalable App");
+    auto windowName = "Raylib-CPP Scalable App";
+    raylib::Window window(virtualScreenWidth, virtualScreenHeight, windowName);
     SetTargetFPS(60);
+
+    // 테스트용 PNG 파일 3종 자동 생성 (한 번 생성되면 resources 폴더에 저장됨)
+    TestUtils::GenerateAssets();
 
     raylib::RenderTexture2D target(virtualScreenWidth, virtualScreenHeight);
     SetTextureFilter(target.GetTexture(), TEXTURE_FILTER_BILINEAR);
 
-    Engine::Scene::SceneManager sceneManager;
+    ES::SceneManager sceneManager; // 씬 관리자
 
+    // Scene 등록
     sceneManager.RegisterScene<TitleScene>("Title");
     sceneManager.RegisterScene<GameplayScene>("Gameplay");
     sceneManager.RegisterScene<GameOverScene>("GameOver");
     sceneManager.RegisterScene<StageClearScene>("StageClear");
 
-    sceneManager.ChangeScene("Title");
+    sceneManager.ChangeScene("Title"); // 최초 씬 설정    
 
     while (!window.ShouldClose()) {
-        int screenWidth = GetScreenWidth();
-        int screenHeight = GetScreenHeight();
+        // 현재 화면 크기 가져오기
+        const int screenWidth  = GetScreenWidth();
+        const int screenHeight = GetScreenHeight();
 
-        auto scaleX = (float)screenWidth / (float)virtualScreenWidth;
+        // 가상 화면 크기에 맞춰 스케일 계산
+        auto scaleX = (float)screenWidth  / (float)virtualScreenWidth;
 		auto scaleY = (float)screenHeight / (float)virtualScreenHeight;
         float scale = std::min(scaleX, scaleY);
 
-        // 씬 로직 업데이트 (ClickableAreaManager 내부에서 보정 좌표 자동 사용)
+        // [1] 씬 로직 업데이트 (ClickableAreaManager 내부에서 보정 좌표 자동 사용)
         sceneManager.Update();
 
-        // 가상 렌더 텍스처에 그리기
+        // [2] 가상 렌더 텍스처에 그리기
         target.BeginMode();
             sceneManager.Draw();
         target.EndMode();
 
-        // 레터박스 적용 후 화면에 렌더링
+        // [3] 레터박스 적용 후 화면에 렌더링
         window.BeginDrawing();
             raylib::Color::Black().ClearBackground();
 
@@ -79,6 +93,7 @@ int main() {
                 virtualScreenHeight* scale // Height scaled
             };
 
+            // Draw the render texture to the screen with scaling and letterboxing
             auto origin_draw = raylib::Vector2{ 0, 0 };
             auto rotation_draw = 0.0f;
             auto tint_draw = raylib::Color::White();
