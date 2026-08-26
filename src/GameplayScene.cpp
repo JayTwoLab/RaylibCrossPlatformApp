@@ -33,7 +33,7 @@ void GameplayScene::Init() {
     });
 
     // 2. 바닥 배경 오브젝트 설정 (Z: 0)
-    backgroundProp_.RegisterClip("prop", "resources/character_idle.png");
+    backgroundProp_.RegisterClip("prop", "resources/back_char.png");
     backgroundProp_.SetPosition(400.0f, 300.0f);
     backgroundProp_.SetScale(2.5f);
     backgroundProp_.SetRotationSpeed(0.0f);
@@ -42,9 +42,9 @@ void GameplayScene::Init() {
         TraceLog(LOG_INFO, "Background Prop Clicked!");
         score_ += 10;
     });
-
+     
     // 3. 상단 회전 이펙트 설정 (Z: 20)
-    floatingEffect_.RegisterClip("effect", "resources/character_hurt.png");
+    floatingEffect_.RegisterClip("effect", "resources/rotate_char.png");
     floatingEffect_.SetPosition(400.0f, 270.0f);
     floatingEffect_.SetScale(0.6f);
     floatingEffect_.SetRotationSpeed(180.0f);
