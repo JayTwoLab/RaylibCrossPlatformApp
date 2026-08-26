@@ -9,11 +9,6 @@ void TitleScene::Init() {
     using EDD = Engine::Display::Display;
     auto& display = EDD::Instance();
 
-    // const int virtualScreenWidth = display.VirtualWidth;
-    // assert(virtualScreenWidth >= 800);
-    // const int virtualScreenHeight = display.VirtualHeight;
-    // assert(virtualScreenHeight >= 600);
-
     nextScene_ = "";
     clickManager_.Clear();
 
@@ -54,19 +49,37 @@ void TitleScene::Update() {
 
     // 좌 클릭
     if (raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_LEFT)) {
+
+        // 드래그 박스 안에서 클릭했는지 확인
         if (dragBox_.CheckCollision(mousePos)) {
             isDragging_ = true;
             dragOffset_.x = mousePos.x - dragBox_.x;
             dragOffset_.y = mousePos.y - dragBox_.y;
         }
 
-        lastClickedPos_ = mousePos;
+        lastClickedPos_ = mousePos; // 마지막 클릭 좌표 저장
 
         // 콘솔 출력 (디버깅용)
-        TraceLog(LOG_INFO, "L-Clicked Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
+        bool nonVirtualArea = false;
+        if (mousePos.x <= 0 || mousePos.y <= 0) {
+            nonVirtualArea = true;
+        }
+        using EDD = Engine::Display::Display;
+        auto& display = EDD::Instance();
+        const int virtualScreenWidth = display.VirtualWidth;
+        const int virtualScreenHeight = display.VirtualHeight;
+        if (mousePos.x >= virtualScreenWidth || mousePos.y >= virtualScreenHeight) {
+            nonVirtualArea = true;
+        }
+        if (nonVirtualArea) {
+            TraceLog(LOG_INFO, "L-Clicked Position: [Non-Virtual Area]");
+        }
+        else {
+            TraceLog(LOG_INFO, "L-Clicked Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
+        }
     }
 
-    // 좌 클릭 유지 중
+    // (드래그 박스의) 좌 클릭 유지 중
     if (isDragging_ && raylib::Mouse::IsButtonDown(MOUSE_BUTTON_LEFT)) {
         dragBox_.x = mousePos.x - dragOffset_.x;
         dragBox_.y = mousePos.y - dragOffset_.y;
@@ -80,21 +93,69 @@ void TitleScene::Update() {
         isDragging_ = false;
 
         // 콘솔 출력 (디버깅용)
-        TraceLog(LOG_INFO, "L-Released Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
+        bool nonVirtualArea = false;
+        if (mousePos.x <= 0 || mousePos.y <= 0) {
+            nonVirtualArea = true;
+        }
+        using EDD = Engine::Display::Display;
+        auto& display = EDD::Instance();
+        const int virtualScreenWidth = display.VirtualWidth;
+        const int virtualScreenHeight = display.VirtualHeight;
+        if (mousePos.x >= virtualScreenWidth || mousePos.y >= virtualScreenHeight) {
+            nonVirtualArea = true;
+        }
+        if (nonVirtualArea) {
+            TraceLog(LOG_INFO, "L-Released Position: [Non-Virtual Area]");
+        }
+        else {
+            TraceLog(LOG_INFO, "L-Released Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
+        }
     }
 
     // 우 클릭 시 (안드로이드 터치 스크린에서는 우클릭 없음)   
     if (raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_RIGHT)) {
-
         // 콘솔 출력 (디버깅용)
-        TraceLog(LOG_INFO, "R-Clicked Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
+        bool nonVirtualArea = false;
+        if (mousePos.x <= 0 || mousePos.y <= 0) {
+            nonVirtualArea = true;
+        }
+        using EDD = Engine::Display::Display;
+        auto& display = EDD::Instance();
+        const int virtualScreenWidth = display.VirtualWidth;
+        const int virtualScreenHeight = display.VirtualHeight;
+        if (mousePos.x >= virtualScreenWidth || mousePos.y >= virtualScreenHeight) {
+            nonVirtualArea = true;
+        }
+        if (nonVirtualArea) {
+            TraceLog(LOG_INFO, "R-Clicked Position: [Non-Virtual Area]");
+        }
+        else {
+            TraceLog(LOG_INFO, "R-Clicked Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
+        }
     }
 
 	// 우 클릭 해제 시 (안드로이드 터치 스크린에서는 우클릭 없음) 
     if (raylib::Mouse::IsButtonReleased(MOUSE_BUTTON_RIGHT)) {
         // 콘솔 출력 (디버깅용)
-        TraceLog(LOG_INFO, "R-Released Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
+        bool nonVirtualArea = false;
+        if (mousePos.x <= 0 || mousePos.y <= 0) {
+            nonVirtualArea = true;
+        }
+        using EDD = Engine::Display::Display;
+        auto& display = EDD::Instance();
+        const int virtualScreenWidth = display.VirtualWidth;
+        const int virtualScreenHeight = display.VirtualHeight;
+        if (mousePos.x >= virtualScreenWidth || mousePos.y >= virtualScreenHeight) {
+            nonVirtualArea = true;
+        }
+        if (nonVirtualArea) {
+            TraceLog(LOG_INFO, "R-Released Position: [Non-Virtual Area]");
+        }
+        else {
+            TraceLog(LOG_INFO, "R-Released Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
+        }
     }
+
 }
 
 void TitleScene::Draw() {

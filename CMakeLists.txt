@@ -56,8 +56,10 @@ elseif(IOS)
 else()
     add_executable(${EXE_NAME} ${SOURCES})
 endif()
+
+# Copy resources/ to build directory after building the target 
 include(CopyResources.cmake)
-add_copy_resources(${EXE_NAME}) # Copy resources/ to build directory after building the target
+add_copy_resources(${EXE_NAME}) 
 
 target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/raylib-cpp")

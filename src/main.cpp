@@ -10,7 +10,6 @@
 #include "GenerateTestAssets.hpp"
 
 int main() {
-
 #ifdef NDEBUG
     // 릴리즈 모드: 치명적인 에러만 출력하거나 아예 끔
     SetTraceLogLevel(LOG_FATAL); 
@@ -30,7 +29,7 @@ int main() {
     display.VirtualWidth  = 800;
 	display.VirtualHeight = 600;
 
-	const int virtualScreenWidth = display.VirtualWidth;
+	const int virtualScreenWidth  = display.VirtualWidth;
 	const int virtualScreenHeight = display.VirtualHeight;
 
     auto configFlags =
@@ -46,7 +45,8 @@ int main() {
     // TestUtils::GenerateAssets();
 
     raylib::RenderTexture2D target(virtualScreenWidth, virtualScreenHeight);
-    SetTextureFilter(target.GetTexture(), TEXTURE_FILTER_BILINEAR);
+    auto textureFilter = TEXTURE_FILTER_BILINEAR; // 선형 필터링 (bilinear filtering)
+    SetTextureFilter(target.GetTexture(), textureFilter);
 
     ES::SceneManager sceneManager; // 씬 관리자
 

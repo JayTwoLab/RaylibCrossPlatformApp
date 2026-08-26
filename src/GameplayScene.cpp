@@ -20,16 +20,15 @@ void GameplayScene::Init() {
     playerSprite_.RegisterClip("idle", "resources/character_idle.png");
     playerSprite_.RegisterClip("hurt", "resources/character_hurt.png");
     playerSprite_.RegisterClipSheet("walk", "resources/character_walk_sheet.png", 4, 0.12f);
-    playerSprite_.SetState("idle");
+    playerSprite_.SetClipState("idle"); // 초기 클립 상태 설정
     playerSprite_.SetPosition(400.0f, 300.0f);
     playerSprite_.SetScale(1.0f);
     playerSprite_.SetRotationSpeed(0.0f);
-    playerSprite_.SetZOrder(10);
-
+    playerSprite_.SetZOrder(10); // Z-Order가 낮을 수록 먼저 렌더링됨
     playerSprite_.SetOnClick([this]() {
-        TraceLog(LOG_INFO, "Player Sprite Clicked!");
         playerHp_ -= 10;
-        playerSprite_.SetState("hurt");
+        TraceLog(LOG_INFO, "Player Sprite Clicked! HP: %d", playerHp_);
+        playerSprite_.SetClipState("hurt");
     });
 
     // 2. 바닥 배경 오브젝트 설정 (Z: 0)
@@ -39,8 +38,8 @@ void GameplayScene::Init() {
     backgroundProp_.SetRotationSpeed(0.0f);
     backgroundProp_.SetZOrder(0);
     backgroundProp_.SetOnClick([this]() {
-        TraceLog(LOG_INFO, "Background Prop Clicked!");
         score_ += 10;
+        TraceLog(LOG_INFO, "Background Prop Clicked! Score: %d", score_);
     });
      
     // 3. 상단 회전 이펙트 설정 (Z: 20)
@@ -50,8 +49,8 @@ void GameplayScene::Init() {
     floatingEffect_.SetRotationSpeed(180.0f);
     floatingEffect_.SetZOrder(20);
     floatingEffect_.SetOnClick([this]() {
-        TraceLog(LOG_INFO, "Floating Effect Clicked!");
         score_ += 50;
+        TraceLog(LOG_INFO, "Floating Effect Clicked! Score: %d", score_);
     });
 
     // 4. 렌더 목록 등록
@@ -68,7 +67,7 @@ void GameplayScene::Init() {
     clickManager_.AddRegion("hit_area", raylib::Rectangle{ 50, 500, 150, 40 }, [this]() {
         playerHp_ -= 50;
         if (playerHp_ <= 50 && playerHp_ > 0) {
-            playerSprite_.SetState("hurt");
+            playerSprite_.SetClipState("hurt");
         }
         });
 
@@ -82,12 +81,16 @@ void GameplayScene::Update() {
 
     // 스프라이트 클릭 판정 (Z-Order 내림차순 검사)
     if (raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_LEFT)) {
-        raylib::Vector2 mousePos = Engine::Display::Display::Instance().GetVirtualMousePosition();
+        namespace ED = Engine::Display;
+        namespace EG = Engine::Graphics;
+
+        using EDD = Engine::Display::Display;
+        using RotatingSprite = EG::RotatingSprite;
+        auto& display = EDD::Instance();
+
+        raylib::Vector2 mousePos = display.GetVirtualMousePosition();
 
         auto sortedList = renderList_;
-        std::sort(sortedList.begin(), sortedList.end(), [](const auto* a, const auto* b) {
-            return a->GetZOrder() > b->GetZOrder();
-            });
 
         for (auto* sprite : sortedList) {
             if (sprite->GetBounds().CheckCollision(mousePos)) {
@@ -106,9 +109,9 @@ void GameplayScene::Update() {
     bool isMoving = false;
 
     if (IsKeyDown(KEY_RIGHT)) { pos.x += 4.0f; isMoving = true; }
-    if (IsKeyDown(KEY_LEFT)) { pos.x -= 4.0f; isMoving = true; }
-    if (IsKeyDown(KEY_UP)) { pos.y -= 4.0f; isMoving = true; }
-    if (IsKeyDown(KEY_DOWN)) { pos.y += 4.0f; isMoving = true; }
+    if (IsKeyDown(KEY_LEFT))  { pos.x -= 4.0f; isMoving = true; }
+    if (IsKeyDown(KEY_UP))    { pos.y -= 4.0f; isMoving = true; }
+    if (IsKeyDown(KEY_DOWN))  { pos.y += 4.0f; isMoving = true; }
 
     pos.x = std::clamp(pos.x, 30.0f, 770.0f);
     pos.y = std::clamp(pos.y, 30.0f, 570.0f);
@@ -118,10 +121,10 @@ void GameplayScene::Update() {
 
     if (playerHp_ > 50) {
         if (isMoving) {
-            playerSprite_.SetState("walk");
+            playerSprite_.SetClipState("walk");
         }
         else {
-            playerSprite_.SetState("idle");
+            playerSprite_.SetClipState("idle");
         }
     }
 
@@ -138,11 +141,7 @@ void GameplayScene::Update() {
 
 void GameplayScene::Draw() {
     raylib::Color::LightGray().ClearBackground();
-
-    //std::stable_sort(renderList_.begin(), renderList_.end(), [](const auto* a, const auto* b) {
-    //    return a->GetZOrder() < b->GetZOrder();
-    //    });
-
+ 
     for (const auto* sprite : renderList_) {
         sprite->Draw();
     }

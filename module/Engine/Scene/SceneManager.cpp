@@ -6,34 +6,37 @@ namespace Engine {
     namespace Scene {
 
         void SceneManager::ChangeScene(const std::string& name) {
-            auto it = sceneFactories.find(name);
-            if (it == sceneFactories.end()) {
+            auto it = sceneFactories_.find(name);
+            if (it == sceneFactories_.end()) {
                 TraceLog(LOG_WARNING, "Scene not found: %s", name.c_str());
                 return;
             }
 
-            if (currentScene) {
-                currentScene->Unload();
+            if (currentScene_) {
+                currentScene_->Unload();
             }
 
-            currentScene = it->second(); 
-            currentScene->Init();
+            currentScene_ = it->second();
+            if (currentScene_) {
+                currentScene_->Init();
+            }
         }
 
         void SceneManager::Update() {
-            if (!currentScene) return;
+            if (!currentScene_)
+                return;
 
-            currentScene->Update();
+            currentScene_->Update();
 
-            std::string next = currentScene->GetNextScene();
+            std::string next = currentScene_->GetNextScene();
             if (!next.empty()) {
                 ChangeScene(next);
             }
         }
 
         void SceneManager::Draw() {
-            if (currentScene) {
-                currentScene->Draw();
+            if (currentScene_) {
+                currentScene_->Draw();
             }
         }
 

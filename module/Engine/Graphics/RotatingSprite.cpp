@@ -42,13 +42,13 @@ namespace Engine {
             clips[key] = std::move(clip);
 
             if (currentClip == nullptr) {
-                SetState(key);
+                SetClipState(key);
             }
 
             return true;
         }
 
-        bool RotatingSprite::SetState(const std::string& key) {
+        bool RotatingSprite::SetClipState(const std::string& key) {
             auto it = clips.find(key);
             if (it == clips.end()) return false;
 

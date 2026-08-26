@@ -40,7 +40,7 @@ namespace Engine {
 
             bool RegisterClip(const std::string& key, const std::string& filePath);
             bool RegisterClipSheet(const std::string& key, const std::string& filePath, int frames, float animSpeed);
-            bool SetState(const std::string& key);
+            bool SetClipState(const std::string& key);
 
             void Update();
             void Draw() const;

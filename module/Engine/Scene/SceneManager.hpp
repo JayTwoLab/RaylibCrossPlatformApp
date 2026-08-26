@@ -12,13 +12,13 @@ namespace Engine {
 
         class SceneManager {
         private:
-            std::unique_ptr<Scene> currentScene;
-            std::unordered_map<std::string, std::function<std::unique_ptr<Scene>()>> sceneFactories;
+            std::unique_ptr<Scene> currentScene_;
+            std::unordered_map<std::string, std::function<std::unique_ptr<Scene>()>> sceneFactories_;
 
         public:
             template <typename T>
             void RegisterScene(const std::string& name) {
-                sceneFactories[name] = []() { return std::make_unique<T>(); };
+                sceneFactories_[name] = []() { return std::make_unique<T>(); };
             } 
 
             void ChangeScene(const std::string& name);
