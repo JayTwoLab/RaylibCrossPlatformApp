@@ -59,6 +59,11 @@ void GameplayScene::Init() {
     renderList_.push_back(&backgroundProp_);
     renderList_.push_back(&floatingEffect_);
 
+    // Z-Order 기준으로 안정 정렬 (낮은 Z가 먼저 렌더링)
+    std::stable_sort(renderList_.begin(), renderList_.end(), [](const auto* a, const auto* b) {
+        return a->GetZOrder() < b->GetZOrder();
+    });
+
     // 5. 버튼 등록
     clickManager_.AddRegion("hit_area", raylib::Rectangle{ 50, 500, 150, 40 }, [this]() {
         playerHp_ -= 50;
@@ -134,9 +139,9 @@ void GameplayScene::Update() {
 void GameplayScene::Draw() {
     raylib::Color::LightGray().ClearBackground();
 
-    std::stable_sort(renderList_.begin(), renderList_.end(), [](const auto* a, const auto* b) {
-        return a->GetZOrder() < b->GetZOrder();
-        });
+    //std::stable_sort(renderList_.begin(), renderList_.end(), [](const auto* a, const auto* b) {
+    //    return a->GetZOrder() < b->GetZOrder();
+    //    });
 
     for (const auto* sprite : renderList_) {
         sprite->Draw();
