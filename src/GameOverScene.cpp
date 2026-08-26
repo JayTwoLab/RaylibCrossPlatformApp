@@ -1,22 +1,24 @@
 #include "GameOverScene.hpp"
 
-GameOverScene::GameOverScene() : nextScene("") {}
+GameOverScene::GameOverScene() {
+    nextScene_ = "";
+}
 
 void GameOverScene::Init() {
-    nextScene = "";
-    clickManager.Clear();
+    nextScene_ = "";
+    clickManager_.Clear();
 
-    clickManager.AddRegion("retry_button", raylib::Rectangle{ 250, 250, 130, 50 }, [this]() {
-        this->nextScene = "Gameplay";
+    clickManager_.AddRegion("retry_button", raylib::Rectangle{ 250, 250, 130, 50 }, [this]() {
+        this->nextScene_ = "Gameplay";
         });
 
-    clickManager.AddRegion("title_button", raylib::Rectangle{ 420, 250, 130, 50 }, [this]() {
-        this->nextScene = "Title";
+    clickManager_.AddRegion("title_button", raylib::Rectangle{ 420, 250, 130, 50 }, [this]() {
+        this->nextScene_ = "Title";
         });
 }
 
 void GameOverScene::Update() { 
-    clickManager.Update();
+    clickManager_.Update();
 }
 
 void GameOverScene::Draw() {
@@ -29,13 +31,13 @@ void GameOverScene::Draw() {
     raylib::Rectangle(420, 250, 130, 50).Draw(raylib::Color::DarkGray());
     raylib::DrawText("TITLE", 460, 265, 20, raylib::Color::White());
 
-    clickManager.DrawDebug();
+    clickManager_.DrawDebug();
 }
 
 void GameOverScene::Unload() {
-    clickManager.Clear();
+    clickManager_.Clear();
 }
 
-std::string GameOverScene::GetNextScene() const {
-    return nextScene;
+std::string GameOverScene::GetNextScene() {
+    return nextScene_;
 }

@@ -8,6 +8,7 @@ namespace Engine {
 
         class Scene {
         public:
+            Scene() = default;
             virtual ~Scene() = default;
 
             virtual void Init() = 0;
@@ -15,7 +16,11 @@ namespace Engine {
             virtual void Draw() = 0;
             virtual void Unload() = 0;
 
-            virtual std::string GetNextScene() const;
+            virtual std::string GetNextScene() = 0;
+
+        protected:
+            std::string nextScene_{""};
+
         };
 
     } // namespace Scene

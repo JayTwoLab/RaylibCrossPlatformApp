@@ -1,18 +1,20 @@
 #include "StageClearScene.hpp"
 
-StageClearScene::StageClearScene() : nextScene("") {}
+StageClearScene::StageClearScene() {
+    nextScene_ = "";
+}
 
 void StageClearScene::Init() {
-    nextScene = "";
-    clickManager.Clear();
+    nextScene_ = "";
+    clickManager_.Clear();
 
-    clickManager.AddRegion("back_to_title", raylib::Rectangle{ 330, 250, 140, 50 }, [this]() {
-        this->nextScene = "Title";
+    clickManager_.AddRegion("back_to_title", raylib::Rectangle{ 330, 250, 140, 50 }, [this]() {
+        this->nextScene_ = "Title";
         });
 }
 
 void StageClearScene::Update() {
-    clickManager.Update();
+    clickManager_.Update();
 } 
 
 void StageClearScene::Draw() {
@@ -22,13 +24,13 @@ void StageClearScene::Draw() {
     raylib::Rectangle(330, 250, 140, 50).Draw(raylib::Color::DarkBlue());
     raylib::DrawText("TITLE", 370, 265, 20, raylib::Color::White());
 
-    clickManager.DrawDebug();
+    clickManager_.DrawDebug();
 }
 
 void StageClearScene::Unload() {
-    clickManager.Clear();
+    clickManager_.Clear();
 }
 
-std::string StageClearScene::GetNextScene() const {
-    return nextScene;
+std::string StageClearScene::GetNextScene() {
+    return nextScene_;
 }

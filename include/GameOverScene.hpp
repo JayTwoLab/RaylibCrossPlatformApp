@@ -6,8 +6,7 @@
 
 class GameOverScene : public Engine::Scene::Scene {
 private:
-    std::string nextScene;
-    Engine::UI::ClickableAreaManager clickManager;
+    Engine::UI::ClickableAreaManager clickManager_;
 
 public:
     GameOverScene();
@@ -17,5 +16,5 @@ public:
     void Draw() override;
     void Unload() override;
 
-    std::string GetNextScene() const override;
+    std::string GetNextScene() override;
 };

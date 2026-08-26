@@ -7,17 +7,16 @@
 
 class GameplayScene : public Engine::Scene::Scene {
 private:
-    std::string nextScene;
-    Engine::UI::ClickableAreaManager clickManager;
+    Engine::UI::ClickableAreaManager clickManager_;
 
-    std::vector<Engine::Graphics::RotatingSprite*> renderList;
+    std::vector<Engine::Graphics::RotatingSprite*> renderList_;
 
-    Engine::Graphics::RotatingSprite backgroundProp;
-    Engine::Graphics::RotatingSprite playerSprite;
-    Engine::Graphics::RotatingSprite floatingEffect;
+    Engine::Graphics::RotatingSprite backgroundProp_;
+    Engine::Graphics::RotatingSprite playerSprite_;
+    Engine::Graphics::RotatingSprite floatingEffect_;
 
-    int playerHp;
-    int score;
+    int playerHp_;
+    int score_;
 
     void ResetFields();
 
@@ -29,5 +28,5 @@ public:
     void Draw() override;
     void Unload() override;
 
-    std::string GetNextScene() const override;
+    std::string GetNextScene() override;
 };

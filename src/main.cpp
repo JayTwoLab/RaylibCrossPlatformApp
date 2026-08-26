@@ -13,7 +13,8 @@ int main() {
 
 #ifdef NDEBUG
     // 릴리즈 모드: 치명적인 에러만 출력하거나 아예 끔
-    SetTraceLogLevel(LOG_FATAL); // 또는 LOG_NONE
+    SetTraceLogLevel(LOG_FATAL); 
+    // SetTraceLogLevel(LOG_NONE); // 로그 끔
 #else
     // 디버그 모드: 모든 정보/경고/에러 출력
     SetTraceLogLevel(LOG_ALL);   // 또는 LOG_INFO
@@ -42,7 +43,7 @@ int main() {
     SetTargetFPS(60);
 
     // 테스트용 PNG 파일 3종 자동 생성 (한 번 생성되면 resources 폴더에 저장됨)
-    TestUtils::GenerateAssets();
+    // TestUtils::GenerateAssets();
 
     raylib::RenderTexture2D target(virtualScreenWidth, virtualScreenHeight);
     SetTextureFilter(target.GetTexture(), TEXTURE_FILTER_BILINEAR);

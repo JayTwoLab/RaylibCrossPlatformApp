@@ -56,6 +56,8 @@ elseif(IOS)
 else()
     add_executable(${EXE_NAME} ${SOURCES})
 endif()
+include(CopyResources.cmake)
+add_copy_resources(${EXE_NAME}) # Copy resources/ to build directory after building the target
 
 target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/raylib-cpp")
@@ -101,3 +103,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT ANDROID)
     find_package(Threads REQUIRED)
     target_link_libraries(${EXE_NAME} PRIVATE Threads::Threads m dl)
 endif()
+
+
+
+
+
+ 
+
+

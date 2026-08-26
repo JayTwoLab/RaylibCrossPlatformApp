@@ -14,71 +14,70 @@ void TitleScene::Init() {
     // const int virtualScreenHeight = display.VirtualHeight;
     // assert(virtualScreenHeight >= 600);
 
-    nextScene = "";
-    clickManager.Clear();
+    nextScene_ = "";
+    clickManager_.Clear();
 
     // 드래그 박스 초기화
-    dragBox = { 100, 100, 120, 80 }; 
-    isDragging = false;
+    dragBox_ = { 100, 100, 120, 80 };
+    isDragging_ = false;
 
     // 버튼 클릭 영역 등록
-    clickManager.AddRegion("start_button", raylib::Rectangle{ 300, 180, 200, 50 }, [this]() {
-        this->nextScene = "Gameplay";
+    clickManager_.AddRegion("start_button", raylib::Rectangle{ 300, 180, 200, 50 }, [this]() {
+        this->nextScene_ = "Gameplay";
         });
 
-    clickManager.AddRegion("vol_down", raylib::Rectangle{ 300, 250, 40, 40 }, [this]() {
-        if (soundVolume > 0) soundVolume -= 10;
+    clickManager_.AddRegion("vol_down", raylib::Rectangle{ 300, 250, 40, 40 }, [this]() {
+        if (soundVolume_ > 0) soundVolume_ -= 10;
         });
 
-    clickManager.AddRegion("vol_up", raylib::Rectangle{ 460, 250, 40, 40 }, [this]() {
-        if (soundVolume < 100) soundVolume += 10;
+    clickManager_.AddRegion("vol_up", raylib::Rectangle{ 460, 250, 40, 40 }, [this]() {
+        if (soundVolume_ < 100) soundVolume_ += 10;
         });
 }
 
 void TitleScene::Update() {
-    clickManager.Update();
+    namespace ED = Engine::Display;
+    using EDD = Engine::Display::Display;
+    auto& display = EDD::Instance();
+
+    clickManager_.Update();
 
     //-----------------------------
-
     // 멀티 터치 처리 기본 패턴 (안드로이드 등)
     // int touchCount = GetTouchPointCount();
     // if (touchCount >= 2) {
     //     // 두 손가락 이상 터치 시, 드래그 박스 초기화
 	// }
 
-    namespace ED = Engine::Display;
-    using EDD = Engine::Display::Display;
-    auto& display = EDD::Instance();
-
     // 마우스 위치를 가상 좌표로 변환    
     raylib::Vector2 mousePos = display.GetVirtualMousePosition();
 
     // 좌 클릭
     if (raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_LEFT)) {
-        if (dragBox.CheckCollision(mousePos)) {
-            isDragging = true;
-            dragOffset.x = mousePos.x - dragBox.x;
-            dragOffset.y = mousePos.y - dragBox.y;
+        if (dragBox_.CheckCollision(mousePos)) {
+            isDragging_ = true;
+            dragOffset_.x = mousePos.x - dragBox_.x;
+            dragOffset_.y = mousePos.y - dragBox_.y;
         }
 
-        lastClickedPos = mousePos;
+        lastClickedPos_ = mousePos;
 
         // 콘솔 출력 (디버깅용)
         TraceLog(LOG_INFO, "L-Clicked Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
     }
 
     // 좌 클릭 유지 중
-    if (isDragging && raylib::Mouse::IsButtonDown(MOUSE_BUTTON_LEFT)) {
-        dragBox.x = mousePos.x - dragOffset.x;
-        dragBox.y = mousePos.y - dragOffset.y;
+    if (isDragging_ && raylib::Mouse::IsButtonDown(MOUSE_BUTTON_LEFT)) {
+        dragBox_.x = mousePos.x - dragOffset_.x;
+        dragBox_.y = mousePos.y - dragOffset_.y;
 
         // 콘솔 출력 (디버깅용)
-        TraceLog(LOG_INFO, "DragBox Position: (%.1f, %.1f)", dragBox.x, dragBox.y);
+        TraceLog(LOG_INFO, "DragBox Position: (%.1f, %.1f)", dragBox_.x, dragBox_.y);
     }
 
     // 좌 클릭 해제
     if (raylib::Mouse::IsButtonReleased(MOUSE_BUTTON_LEFT)) {
-        isDragging = false;
+        isDragging_ = false;
 
         // 콘솔 출력 (디버깅용)
         TraceLog(LOG_INFO, "L-Released Position: (%.1f, %.1f)", mousePos.x, mousePos.y);
@@ -103,9 +102,9 @@ void TitleScene::Draw() {
     raylib::DrawText("MAIN MENU", 320, 100, 32, raylib::Color::DarkBlue());
 
     // 드래그 박스 렌더링
-    raylib::Color boxColor = isDragging ? raylib::Color::Orange() : raylib::Color::Purple();
-    dragBox.Draw(boxColor);
-    raylib::DrawText("Drag Me!", (int)dragBox.x + 20, (int)dragBox.y + 30, 20, raylib::Color::White());
+    raylib::Color boxColor = isDragging_ ? raylib::Color::Orange() : raylib::Color::Purple();
+    dragBox_.Draw(boxColor);
+    raylib::DrawText("Drag Me!", (int)dragBox_.x + 20, (int)dragBox_.y + 30, 20, raylib::Color::White());
 
     // 버튼 렌더링
     raylib::Rectangle(300, 180, 200, 50).Draw(raylib::Color::SkyBlue());
@@ -114,18 +113,18 @@ void TitleScene::Draw() {
     raylib::Rectangle(300, 250, 40, 40).Draw(raylib::Color::LightGray());
     raylib::DrawText("-", 315, 258, 24, raylib::Color::Black());
 
-    raylib::DrawText(TextFormat("Volume: %d", soundVolume), 355, 260, 20, raylib::Color::DarkGray());
+    raylib::DrawText(TextFormat("Volume: %d", soundVolume_), 355, 260, 20, raylib::Color::DarkGray());
 
     raylib::Rectangle(460, 250, 40, 40).Draw(raylib::Color::LightGray());
     raylib::DrawText("+", 472, 258, 24, raylib::Color::Black());
 
-    clickManager.DrawDebug();
+    clickManager_.DrawDebug();
 }
 
 void TitleScene::Unload() {
-    clickManager.Clear();
+    clickManager_.Clear();
 }
 
-std::string TitleScene::GetNextScene() const {
-    return nextScene;
+std::string TitleScene::GetNextScene() {
+    return nextScene_;
 }
