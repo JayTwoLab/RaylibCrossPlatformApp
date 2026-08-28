@@ -31,7 +31,6 @@ namespace Engine {
             int currentFrame;
             float frameTimer;
 
-            // 클릭 콜백 함수 포인터
             std::function<void()> onClickCallback = nullptr;
 
         public:
@@ -46,23 +45,10 @@ namespace Engine {
             void Draw() const;
             void Unload();
 
-            // 클릭 이벤트 설정 및 트리거
-            void SetOnClick(std::function<void()> callback) { onClickCallback = callback; }
-            bool TriggerClick() {
-                if (onClickCallback) {
-                    onClickCallback();
-                    return true;
-                }
-                return false;
-            }
+            void SetOnClick(std::function<void()> callback);
+            bool TriggerClick();
 
-            // 중심점 기준 사각형 충돌 영역 반환
-            raylib::Rectangle GetBounds() const {
-                if (!currentClip) return { position.x, position.y, 0.0f, 0.0f };
-                float w = currentClip->frameWidth * scale;
-                float h = currentClip->frameHeight * scale;
-                return raylib::Rectangle{ position.x - (w * 0.5f), position.y - (h * 0.5f), w, h };
-            }
+            raylib::Rectangle GetBounds() const;
 
             void SetPosition(const raylib::Vector2& pos);
             void SetPosition(float x, float y);

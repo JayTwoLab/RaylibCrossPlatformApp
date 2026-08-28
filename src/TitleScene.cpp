@@ -6,8 +6,14 @@ TitleScene::TitleScene() {
 
 void TitleScene::Init() {
     namespace ED = Engine::Display;
+    namespace ER = Engine::Resource;
+
     using EDD = Engine::Display::Display;
     auto& display = EDD::Instance();
+
+    using ERM = ER::ResourceManager;
+    auto& resourceManager = ERM::Instance();
+    auto resPath = resourceManager.GetResourcePath();
 
     nextScene_ = "";
     clickManager_.Clear();
@@ -19,18 +25,42 @@ void TitleScene::Init() {
     // 버튼 클릭 영역 등록
     clickManager_.AddRegion("start_button", raylib::Rectangle{ 300, 180, 200, 50 }, [this]() {
         this->nextScene_ = "Gameplay";
-        });
+    });
 
     clickManager_.AddRegion("vol_down", raylib::Rectangle{ 300, 250, 40, 40 }, [this]() {
-        if (soundVolume_ > 0) soundVolume_ -= 10;
-        });
+        if (soundVolume_ > 0.1f) {
+            soundVolume_ -= 0.1f;
+            this->bgm_.SetVolume(soundVolume_);
+            clickSfx_.Play();
+        }
+
+    });
 
     clickManager_.AddRegion("vol_up", raylib::Rectangle{ 460, 250, 40, 40 }, [this]() {
-        if (soundVolume_ < 100) soundVolume_ += 10;
-        });
+        if (soundVolume_ < 1.0f) {
+            soundVolume_ += 0.1f;
+            this->bgm_.SetVolume(soundVolume_);
+            clickSfx_.Play();
+        }
+    });
+
+    std::filesystem::path bgmPath = resPath / "background.mp3";
+    auto bgmPathString = bgmPath.string();
+    bgm_.Load(bgmPathString);
+    bgm_.Play();
+
+    auto clickSfxPath = resPath / "click.wav";
+    auto clickSfxPathString = clickSfxPath.string();
+    clickSfx_.Load(clickSfxPathString);
+    clickSfx_.SetVolume(1.0f);
+
 }
 
 void TitleScene::Update() {
+
+    // 배경음악 업데이트
+    bgm_.Update(); // 누락 시 처음 몇 밀리초만 재생되거나 소리가 안 남
+
     namespace ED = Engine::Display;
     using EDD = Engine::Display::Display;
     auto& display = EDD::Instance();
@@ -174,7 +204,8 @@ void TitleScene::Draw() {
     raylib::Rectangle(300, 250, 40, 40).Draw(raylib::Color::LightGray());
     raylib::DrawText("-", 315, 258, 24, raylib::Color::Black());
 
-    raylib::DrawText(TextFormat("Volume: %d", soundVolume_), 355, 260, 20, raylib::Color::DarkGray());
+    auto volume_percent = static_cast<int>(soundVolume_ * 100);
+    raylib::DrawText(TextFormat("Volume: %d%%", volume_percent), 355, 260, 15, raylib::Color::DarkGray());
 
     raylib::Rectangle(460, 250, 40, 40).Draw(raylib::Color::LightGray());
     raylib::DrawText("+", 472, 258, 24, raylib::Color::Black());
@@ -183,6 +214,9 @@ void TitleScene::Draw() {
 }
 
 void TitleScene::Unload() {
+    bgm_.Unload();
+    clickSfx_.Unload(); 
+
     clickManager_.Clear();
 }
 

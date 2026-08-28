@@ -1,5 +1,6 @@
-#include "GameplayScene.hpp"
 #include <algorithm>
+#include "Engine/Engine.hpp"
+#include "GameplayScene.hpp"
 
 GameplayScene::GameplayScene() {
     ResetFields();
@@ -12,14 +13,21 @@ void GameplayScene::ResetFields() {
 }
 
 void GameplayScene::Init() {
+
+    namespace ER = Engine::Resource;
+    using ERM = ER::ResourceManager;
+    auto& resourceManager = ERM::Instance();
+
+    auto resPath = resourceManager.GetResourcePath(); // 리소스 경로
+
     ResetFields();
     clickManager_.Clear();
     renderList_.clear();
 
     // 1. 플레이어 스프라이트 설정 (Z: 10)
-    playerSprite_.RegisterClip("idle", "resources/character_idle.png");
-    playerSprite_.RegisterClip("hurt", "resources/character_hurt.png");
-    playerSprite_.RegisterClipSheet("walk", "resources/character_walk_sheet.png", 4, 0.12f);
+    playerSprite_.RegisterClip("idle", (resPath / "character_idle.png").string());
+    playerSprite_.RegisterClip("hurt", (resPath / "character_hurt.png").string());
+    playerSprite_.RegisterClipSheet("walk", (resPath / "character_walk_sheet.png").string(), 4, 0.12f);
     playerSprite_.SetClipState("idle"); // 초기 클립 상태 설정
     playerSprite_.SetPosition(400.0f, 300.0f);
     playerSprite_.SetScale(1.0f);
@@ -32,7 +40,7 @@ void GameplayScene::Init() {
     });
 
     // 2. 바닥 배경 오브젝트 설정 (Z: 0)
-    backgroundProp_.RegisterClip("prop", "resources/back_char.png");
+    backgroundProp_.RegisterClip("prop", (resPath / "back_char.png").string());
     backgroundProp_.SetPosition(400.0f, 300.0f);
     backgroundProp_.SetScale(2.5f);
     backgroundProp_.SetRotationSpeed(0.0f);
@@ -43,7 +51,7 @@ void GameplayScene::Init() {
     });
      
     // 3. 상단 회전 이펙트 설정 (Z: 20)
-    floatingEffect_.RegisterClip("effect", "resources/rotate_char.png");
+    floatingEffect_.RegisterClip("effect", (resPath / "rotate_char.png").string());
     floatingEffect_.SetPosition(400.0f, 270.0f);
     floatingEffect_.SetScale(0.6f);
     floatingEffect_.SetRotationSpeed(180.0f);
@@ -60,20 +68,30 @@ void GameplayScene::Init() {
 
     // Z-Order 기준으로 안정 정렬 (낮은 Z가 먼저 렌더링)
     std::stable_sort(renderList_.begin(), renderList_.end(), [](const auto* a, const auto* b) {
-        return a->GetZOrder() < b->GetZOrder();
+        auto ret = a->GetZOrder() < b->GetZOrder();
+        return ret;
     });
 
     // 5. 버튼 등록
-    clickManager_.AddRegion("hit_area", raylib::Rectangle{ 50, 500, 150, 40 }, [this]() {
-        playerHp_ -= 50;
-        if (playerHp_ <= 50 && playerHp_ > 0) {
-            playerSprite_.SetClipState("hurt");
+    clickManager_.AddRegion(
+        "hit_area",
+        raylib::Rectangle{ 50, 500, 150, 40 },
+        [this]() {
+            playerHp_ -= 50;
+            if (playerHp_ <= 50 && playerHp_ > 0) {
+                playerSprite_.SetClipState("hurt");
+            }
         }
-        });
+    );
 
-    clickManager_.AddRegion("score_area", raylib::Rectangle{ 220, 500, 150, 40 }, [this]() {
-        score_ += 50;
-        });
+    clickManager_.AddRegion(
+        "score_area",
+        raylib::Rectangle{ 220, 500, 150, 40 },
+        [this]() {
+            score_ += 50;
+        }
+    );
+
 }
 
 void GameplayScene::Update() {

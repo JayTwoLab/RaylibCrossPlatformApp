@@ -8,7 +8,7 @@
 # 2) Or create a standalone target and make your target depend on it:
 #      add_custom_target(copy_resources ALL ...)            # runs every build if ALL is used
 #      add_dependencies(myapp copy_resources)              # copy runs before myapp builds
-
+ 
 function(add_copy_resources target)
     add_custom_command(
         TARGET ${target}

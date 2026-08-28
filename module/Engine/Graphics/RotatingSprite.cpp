@@ -107,6 +107,25 @@ namespace Engine {
             currentClipKey = "";
         }
 
+        void RotatingSprite::SetOnClick(std::function<void()> callback) {
+            onClickCallback = callback;
+        }
+
+        bool RotatingSprite::TriggerClick() {
+            if (onClickCallback) {
+                onClickCallback();
+                return true;
+            }
+            return false;
+        }
+
+        raylib::Rectangle  RotatingSprite::GetBounds() const {
+            if (!currentClip) return { position.x, position.y, 0.0f, 0.0f };
+            float w = currentClip->frameWidth * scale;
+            float h = currentClip->frameHeight * scale;
+            return raylib::Rectangle{ position.x - (w * 0.5f), position.y - (h * 0.5f), w, h };
+        }
+
         void RotatingSprite::SetPosition(const raylib::Vector2& pos) { position = pos; }
         void RotatingSprite::SetPosition(float x, float y) { position = { x, y }; }
         void RotatingSprite::SetRotation(float deg) { rotation = deg; }

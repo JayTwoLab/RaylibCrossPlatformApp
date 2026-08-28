@@ -19,6 +19,7 @@ if (NOT DEFINED CMAKE_CXX_STANDARD)
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+ 
 
 # ------------------------------------------------------------------------------
 # 1. Executable Name Configuration
@@ -58,14 +59,19 @@ else()
 endif()
 
 # Copy resources/ to build directory after building the target 
-include(CopyResources.cmake)
-add_copy_resources(${EXE_NAME}) 
+# include(CopyResources.cmake)
+# add_copy_resources(${EXE_NAME}) 
 
 target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/raylib-cpp")
 target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/module")
 
 target_link_libraries(${EXE_NAME} PRIVATE raylib)
+
+# Define CURRENT_PROJECT_DIR for use in the source code
+target_compile_definitions(${EXE_NAME} PRIVATE 
+    CURRENT_PROJECT_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+)
 
 # ------------------------------------------------------------------------------
 # 5. Platform and Compiler Specific Configurations

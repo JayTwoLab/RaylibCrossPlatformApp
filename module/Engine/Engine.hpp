@@ -11,3 +11,4 @@
 
 #include "Engine/UI/ClickableAreaManager.hpp"
 
+#include "Engine/Resource/ResourceManager.hpp"

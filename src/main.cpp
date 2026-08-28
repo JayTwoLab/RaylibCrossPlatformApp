@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <filesystem>
 #include "raylib-cpp.hpp" // raylib-cpp 
 #include "Engine/Engine.hpp" // module
 
@@ -22,8 +23,29 @@ int main() {
     namespace ED = Engine::Display;
     namespace ES = Engine::Scene;
     namespace EU = Engine::UI;
-    using EDD = Engine::Display::Display;
+    namespace ER = Engine::Resource;
+
+    using EDD = ED::Display;
     auto& display = EDD::Instance();
+    using ERM = ER::ResourceManager;
+    auto& resourceManager = ERM::Instance();
+
+#ifdef NDEBUG
+    std::string resPathName = "resources";
+    std::filesystem::path resPath = resPathName;
+    resourceManager.SetResourcePath(resPath);
+#else
+    std::string resPathName = "resources";
+    auto currentPrjDir = CURRENT_PROJECT_DIR; // 현재 CMakeLists.txt 의 경로
+    std::filesystem::path resPath = std::filesystem::path(currentPrjDir) / resPathName;
+    resourceManager.SetResourcePath(resPath);
+#endif
+
+    raylib::AudioDevice audioDevice; // 또는 InitAudioDevice();
+    if (!IsAudioDeviceReady()) {
+        TraceLog(LOG_ERROR, "오디오 장치 초기화 실패!");
+        return -1;
+    }
 
     // 가상 화면 크기 설정
     display.VirtualWidth  = 800;
@@ -69,6 +91,7 @@ int main() {
         float scale = std::min(scaleX, scaleY);
 
         // [1] 씬 로직 업데이트 (ClickableAreaManager 내부에서 보정 좌표 자동 사용)
+        //  NOTE: 씬 매니저의 Update() 가 Draw() 보다 먼저 호출됨.
         sceneManager.Update();
 
         // [2] 가상 렌더 텍스처에 그리기

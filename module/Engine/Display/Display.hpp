@@ -7,10 +7,7 @@ namespace Engine {
         class Display {
         public:
             // Access the singleton instance
-            static Display& Instance() {
-                static Display instance;
-                return instance;
-            }
+            static Display& Instance();
 
             // Non-copyable, non-movable
             Display(const Display&) = delete;

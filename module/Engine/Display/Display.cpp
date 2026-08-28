@@ -7,6 +7,11 @@
 namespace Engine {
     namespace Display {
 
+        Display& Display::Instance() {
+            static Display instance;
+            return instance;
+        }
+
         raylib::Vector2 Display::GetVirtualMousePosition() {
             raylib::Vector2 mouse = raylib::Mouse::GetPosition();
 

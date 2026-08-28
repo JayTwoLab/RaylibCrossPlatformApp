@@ -6,6 +6,7 @@
 namespace TestUtils {
 
     inline void GenerateAssets() {
+
         // resources 디렉터리가 없으면 생성
         if (!std::filesystem::exists("resources")) {
             std::filesystem::create_directories("resources");
