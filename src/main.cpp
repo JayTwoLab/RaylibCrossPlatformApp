@@ -27,44 +27,60 @@ int main() {
 
     using EDD = ED::Display;
     auto& display = EDD::Instance();
+
     using ERM = ER::ResourceManager;
     auto& resourceManager = ERM::Instance();
 
 #ifdef NDEBUG
+    // 릴리즈 모드
+    ChangeDirectory(GetApplicationDirectory()); // 실행 파일 위치 기준으로 작업 디렉터리 변경
+
     std::string resPathName = "resources";
     std::filesystem::path resPath = resPathName;
+        // auto currentPrjDir = CURRENT_PROJECT_DIR;
+        // resPath = std::filesystem::path(currentPrjDir) / resPathName;
     resourceManager.SetResourcePath(resPath);
 #else
+    // 디버그 모드
     std::string resPathName = "resources";
     auto currentPrjDir = CURRENT_PROJECT_DIR; // 현재 CMakeLists.txt 의 경로
     std::filesystem::path resPath = std::filesystem::path(currentPrjDir) / resPathName;
     resourceManager.SetResourcePath(resPath);
 #endif
 
-    raylib::AudioDevice audioDevice; // 또는 InitAudioDevice();
+    raylib::AudioDevice audioDevice; // 오디오 장치 초기화
     if (!IsAudioDeviceReady()) {
-        TraceLog(LOG_ERROR, "오디오 장치 초기화 실패!");
+#ifdef __ANDROID__
+        TraceLog(LOG_ERROR, "Failed to initialize audio device on Android!");
+        TraceLog(LOG_WARNING, "Check microphone permissions in AndroidManifest.xml");
+#elif defined(_WIN32)
+        TraceLog(LOG_ERROR, "Failed to initialize audio device on Windows!");
+#elif defined(__APPLE__)
+        TraceLog(LOG_ERROR, "Failed to initialize audio device on macOS!");
+#else
+        TraceLog(LOG_ERROR, "Failed to initialize audio device!");
+#endif
         return -1;
     }
 
     // 가상 화면 크기 설정
     display.VirtualWidth  = 800;
-	display.VirtualHeight = 600;
+    display.VirtualHeight = 600;
 
-	const int virtualScreenWidth  = display.VirtualWidth;
-	const int virtualScreenHeight = display.VirtualHeight;
+    const int virtualScreenWidth  = display.VirtualWidth;
+    const int virtualScreenHeight = display.VirtualHeight;
 
     auto configFlags =
         FLAG_WINDOW_RESIZABLE | // 윈도우 크기 조절 가능
         FLAG_VSYNC_HINT; // 수직 동기화 활성화
     SetConfigFlags(configFlags);
 
+    // 윈도우 생성
     auto windowName = "Raylib-CPP Scalable App";
     raylib::Window window(virtualScreenWidth, virtualScreenHeight, windowName);
-    SetTargetFPS(60);
 
-    // 테스트용 PNG 파일 3종 자동 생성 (한 번 생성되면 resources 폴더에 저장됨)
-    // TestUtils::GenerateAssets();
+    int framePerSecond = 60;
+    SetTargetFPS(framePerSecond);
 
     raylib::RenderTexture2D target(virtualScreenWidth, virtualScreenHeight);
     auto textureFilter = TEXTURE_FILTER_BILINEAR; // 선형 필터링 (bilinear filtering)
@@ -87,7 +103,7 @@ int main() {
 
         // 가상 화면 크기에 맞춰 스케일 계산
         auto scaleX = (float)screenWidth  / (float)virtualScreenWidth;
-		auto scaleY = (float)screenHeight / (float)virtualScreenHeight;
+        auto scaleY = (float)screenHeight / (float)virtualScreenHeight;
         float scale = std::min(scaleX, scaleY);
 
         // [1] 씬 로직 업데이트 (ClickableAreaManager 내부에서 보정 좌표 자동 사용)

@@ -27,32 +27,46 @@ void TitleScene::Init() {
         this->nextScene_ = "Gameplay";
     });
 
-    clickManager_.AddRegion("vol_down", raylib::Rectangle{ 300, 250, 40, 40 }, [this]() {
-        if (soundVolume_ > 0.1f) {
-            soundVolume_ -= 0.1f;
-            this->bgm_.SetVolume(soundVolume_);
-            clickSfx_.Play();
+    clickManager_.AddRegion(
+        "vol_down", // 이름 
+        raylib::Rectangle{ 300, 250, 40, 40 }, // 영역 (x, y, width, height)
+        [this]() { // 클릭 시 실행할 람다 함수
+            if (soundVolume_ > 0.1f) {
+                soundVolume_ -= 0.1f;
+                this->bgm_.SetVolume(soundVolume_);
+                this->sounds_["click"].Play();
+            }
         }
+    );
 
-    });
-
-    clickManager_.AddRegion("vol_up", raylib::Rectangle{ 460, 250, 40, 40 }, [this]() {
-        if (soundVolume_ < 1.0f) {
-            soundVolume_ += 0.1f;
-            this->bgm_.SetVolume(soundVolume_);
-            clickSfx_.Play();
+    clickManager_.AddRegion(
+        "vol_up",
+        raylib::Rectangle{ 460, 250, 40, 40 },
+        [this]() {
+            if (soundVolume_ < 1.0f) {
+                soundVolume_ += 0.1f;
+                this->bgm_.SetVolume(soundVolume_);
+                this->sounds_["click"].Play();
+            }
         }
-    });
+    );
 
-    std::filesystem::path bgmPath = resPath / "background.mp3";
-    auto bgmPathString = bgmPath.string();
-    bgm_.Load(bgmPathString);
+    // Background Music Load and Play
+    auto bgmFileName = "background.mp3";
+    bgm_.Load((resPath / bgmFileName).string());
+    soundVolume_ = 0.5f; // 초기 볼륨 설정
+    bgm_.SetVolume(soundVolume_);
     bgm_.Play();
 
-    auto clickSfxPath = resPath / "click.wav";
-    auto clickSfxPathString = clickSfxPath.string();
-    clickSfx_.Load(clickSfxPathString);
-    clickSfx_.SetVolume(1.0f);
+    // Sound Effects Load
+    sounds_.try_emplace("click", (resPath / "click.wav").string());
+    // sounds_["click"].Play(); // 테스트용: 효과음 재생
+
+    // sounds_.try_emplace("name", (resPath / "file.mp3").string());
+
+    for (auto& snd : sounds_ ) {
+        snd.second.SetVolume(1.0f);
+    }
 
 }
 
@@ -65,7 +79,7 @@ void TitleScene::Update() {
     using EDD = Engine::Display::Display;
     auto& display = EDD::Instance();
 
-    clickManager_.Update();
+    clickManager_.Update(); // UI 클릭 영역 업데이트 (마우스 좌표를 가상 좌표로 변환하여 처리)
 
     //-----------------------------
     // 멀티 터치 처리 기본 패턴 (안드로이드 등)
@@ -214,9 +228,12 @@ void TitleScene::Draw() {
 }
 
 void TitleScene::Unload() {
+    bgm_.Stop();
     bgm_.Unload();
-    clickSfx_.Unload(); 
-
+    for (auto& snd : sounds_) {
+        snd.second.Stop();
+        snd.second.Unload();
+    }
     clickManager_.Clear();
 }
 
