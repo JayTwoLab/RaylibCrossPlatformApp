@@ -18,19 +18,19 @@ void TitleScene::Init() {
     nextScene_ = "";
     clickManager_.Clear();
 
-    // 드래그 박스 초기화
+    // Initialize drag box
     dragBox_ = { 100, 100, 120, 80 };
     isDragging_ = false;
 
-    // 버튼 클릭 영역 등록
+    // Register button click regions
     clickManager_.AddRegion("start_button", raylib::Rectangle{ 300, 180, 200, 50 }, [this]() {
         this->nextScene_ = "Gameplay";
     });
 
     clickManager_.AddRegion(
-        "vol_down", // 이름 
-        raylib::Rectangle{ 300, 250, 40, 40 }, // 영역 (x, y, width, height)
-        [this]() { // 클릭 시 실행할 람다 함수
+        "vol_down", // name
+        raylib::Rectangle{ 300, 250, 40, 40 }, // region (x, y, width, height)
+        [this]() { // lambda executed on click
             if (soundVolume_ > 0.1f) {
                 soundVolume_ -= 0.1f;
                 this->bgm_.SetVolume(soundVolume_);
@@ -54,13 +54,13 @@ void TitleScene::Init() {
     // Background Music Load and Play
     auto bgmFileName = "background.mp3";
     bgm_.Load((resPath / bgmFileName).string());
-    soundVolume_ = 0.5f; // 초기 볼륨 설정
+    soundVolume_ = 0.5f; // initial volume setting
     bgm_.SetVolume(soundVolume_);
     bgm_.Play();
 
     // Sound Effects Load
     sounds_.try_emplace("click", (resPath / "click.wav").string());
-    // sounds_["click"].Play(); // 테스트용: 효과음 재생
+    // sounds_["click"].Play(); // test: play effect sound
 
     // sounds_.try_emplace("name", (resPath / "file.mp3").string());
 
@@ -72,38 +72,39 @@ void TitleScene::Init() {
 
 void TitleScene::Update() {
 
-    // 배경음악 업데이트
-    bgm_.Update(); // 누락 시 처음 몇 밀리초만 재생되거나 소리가 안 남
+    // Update background music
+    // If omitted, it may play only the first few milliseconds or produce no sound
+    bgm_.Update();
 
     namespace ED = Engine::Display;
     using EDD = Engine::Display::Display;
     auto& display = EDD::Instance();
 
-    clickManager_.Update(); // UI 클릭 영역 업데이트 (마우스 좌표를 가상 좌표로 변환하여 처리)
+    clickManager_.Update(); // Update UI click regions (converts mouse coords to virtual coords)
 
     //-----------------------------
-    // 멀티 터치 처리 기본 패턴 (안드로이드 등)
+    // Multi-touch handling basic pattern (Android, etc.)
     // int touchCount = GetTouchPointCount();
     // if (touchCount >= 2) {
-    //     // 두 손가락 이상 터치 시, 드래그 박스 초기화
-	// }
+    //     // Reset drag box when two or more fingers touch
+    // }
 
-    // 마우스 위치를 가상 좌표로 변환    
+    // Convert mouse position to virtual coordinates
     raylib::Vector2 mousePos = display.GetVirtualMousePosition();
 
-    // 좌 클릭
+    // Left click
     if (raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_LEFT)) {
 
-        // 드래그 박스 안에서 클릭했는지 확인
+        // Check if clicked inside drag box
         if (dragBox_.CheckCollision(mousePos)) {
             isDragging_ = true;
             dragOffset_.x = mousePos.x - dragBox_.x;
             dragOffset_.y = mousePos.y - dragBox_.y;
         }
 
-        lastClickedPos_ = mousePos; // 마지막 클릭 좌표 저장
+        lastClickedPos_ = mousePos; // Store last clicked position
 
-        // 콘솔 출력 (디버깅용)
+        // Console output (for debugging)
         bool nonVirtualArea = false;
         if (mousePos.x <= 0 || mousePos.y <= 0) {
             nonVirtualArea = true;
@@ -123,20 +124,20 @@ void TitleScene::Update() {
         }
     }
 
-    // (드래그 박스의) 좌 클릭 유지 중
+    // While left click held on (the drag box)
     if (isDragging_ && raylib::Mouse::IsButtonDown(MOUSE_BUTTON_LEFT)) {
         dragBox_.x = mousePos.x - dragOffset_.x;
         dragBox_.y = mousePos.y - dragOffset_.y;
 
-        // 콘솔 출력 (디버깅용)
+        // Console output (for debugging)
         TraceLog(LOG_INFO, "DragBox Position: (%.1f, %.1f)", dragBox_.x, dragBox_.y);
     }
 
-    // 좌 클릭 해제
+    // Left click released
     if (raylib::Mouse::IsButtonReleased(MOUSE_BUTTON_LEFT)) {
         isDragging_ = false;
 
-        // 콘솔 출력 (디버깅용)
+        // Console output (for debugging)
         bool nonVirtualArea = false;
         if (mousePos.x <= 0 || mousePos.y <= 0) {
             nonVirtualArea = true;
@@ -156,9 +157,9 @@ void TitleScene::Update() {
         }
     }
 
-    // 우 클릭 시 (안드로이드 터치 스크린에서는 우클릭 없음)   
+    // On right click (no right-click on Android touch screens)
     if (raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_RIGHT)) {
-        // 콘솔 출력 (디버깅용)
+        // Console output (for debugging)
         bool nonVirtualArea = false;
         if (mousePos.x <= 0 || mousePos.y <= 0) {
             nonVirtualArea = true;
@@ -178,9 +179,9 @@ void TitleScene::Update() {
         }
     }
 
-	// 우 클릭 해제 시 (안드로이드 터치 스크린에서는 우클릭 없음) 
+    // On right-click release (no right-click on Android touch screens)
     if (raylib::Mouse::IsButtonReleased(MOUSE_BUTTON_RIGHT)) {
-        // 콘솔 출력 (디버깅용)
+        // Console output (for debugging)
         bool nonVirtualArea = false;
         if (mousePos.x <= 0 || mousePos.y <= 0) {
             nonVirtualArea = true;
@@ -206,12 +207,12 @@ void TitleScene::Draw() {
     raylib::Color::RayWhite().ClearBackground();
     raylib::DrawText("MAIN MENU", 320, 100, 32, raylib::Color::DarkBlue());
 
-    // 드래그 박스 렌더링
+    // Render drag box
     raylib::Color boxColor = isDragging_ ? raylib::Color::Orange() : raylib::Color::Purple();
     dragBox_.Draw(boxColor);
     raylib::DrawText("Drag Me!", (int)dragBox_.x + 20, (int)dragBox_.y + 30, 20, raylib::Color::White());
 
-    // 버튼 렌더링
+    // Button rendering
     raylib::Rectangle(300, 180, 200, 50).Draw(raylib::Color::SkyBlue());
     raylib::DrawText("START GAME", 335, 195, 20, raylib::Color::DarkBlue());
 

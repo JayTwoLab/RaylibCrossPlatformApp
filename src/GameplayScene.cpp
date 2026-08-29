@@ -18,28 +18,28 @@ void GameplayScene::Init() {
     using ERM = ER::ResourceManager;
     auto& resourceManager = ERM::Instance();
 
-    auto resPath = resourceManager.GetResourcePath(); // 리소스 경로
+    auto resPath = resourceManager.GetResourcePath(); // resource path
 
     ResetFields();
     clickManager_.Clear();
     renderList_.clear();
 
-    // 1. 플레이어 스프라이트 설정 (Z: 10)
+    // 1. Player sprite setup (Z: 10)
     playerSprite_.RegisterClip("idle", (resPath / "character_idle.png").string());
     playerSprite_.RegisterClip("hurt", (resPath / "character_hurt.png").string());
     playerSprite_.RegisterClipSheet("walk", (resPath / "character_walk_sheet.png").string(), 4, 0.12f);
-    playerSprite_.SetClipState("idle"); // 초기 클립 상태 설정
+    playerSprite_.SetClipState("idle"); // set initial clip state
     playerSprite_.SetPosition(400.0f, 300.0f);
     playerSprite_.SetScale(1.0f);
     playerSprite_.SetRotationSpeed(0.0f);
-    playerSprite_.SetZOrder(10); // Z-Order가 낮을 수록 먼저 렌더링됨
+    playerSprite_.SetZOrder(10); // Lower Z-order renders first
     playerSprite_.SetOnClick([this]() {
         playerHp_ -= 10;
         TraceLog(LOG_INFO, "Player Sprite Clicked! HP: %d", playerHp_);
         playerSprite_.SetClipState("hurt");
     });
 
-    // 2. 바닥 배경 오브젝트 설정 (Z: 0)
+    // 2. Ground/background prop setup (Z: 0)
     backgroundProp_.RegisterClip("prop", (resPath / "back_char.png").string());
     backgroundProp_.SetPosition(400.0f, 300.0f);
     backgroundProp_.SetScale(2.5f);
@@ -50,7 +50,7 @@ void GameplayScene::Init() {
         TraceLog(LOG_INFO, "Background Prop Clicked! Score: %d", score_);
     });
      
-    // 3. 상단 회전 이펙트 설정 (Z: 20)
+    // 3. Top rotating effect setup (Z: 20)
     floatingEffect_.RegisterClip("effect", (resPath / "rotate_char.png").string());
     floatingEffect_.SetPosition(400.0f, 270.0f);
     floatingEffect_.SetScale(0.6f);
@@ -61,18 +61,18 @@ void GameplayScene::Init() {
         TraceLog(LOG_INFO, "Floating Effect Clicked! Score: %d", score_);
     });
 
-    // 4. 렌더 목록 등록
+    // 4. Register to render list
     renderList_.push_back(&playerSprite_);
     renderList_.push_back(&backgroundProp_);
     renderList_.push_back(&floatingEffect_);
 
-    // Z-Order 기준으로 안정 정렬 (낮은 Z가 먼저 렌더링)
+    // Stable sort by Z-order (lower Z renders first)
     std::stable_sort(renderList_.begin(), renderList_.end(), [](const auto* a, const auto* b) {
         auto ret = a->GetZOrder() < b->GetZOrder();
         return ret;
     });
 
-    // 5. 버튼 등록
+    // 5. Register buttons
     clickManager_.AddRegion(
         "hit_area",
         raylib::Rectangle{ 50, 500, 150, 40 },
@@ -97,7 +97,7 @@ void GameplayScene::Init() {
 void GameplayScene::Update() {
     clickManager_.Update();
 
-    // 스프라이트 클릭 판정 (Z-Order 내림차순 검사)
+    // Sprite click detection (check in descending Z-order)
     if (raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_LEFT)) {
         namespace ED = Engine::Display;
         namespace EG = Engine::Graphics;

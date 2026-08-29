@@ -22,7 +22,7 @@ namespace Engine {
 			int VirtualHeight = Display::Instance().VirtualHeight;
 
             if (VirtualWidth <= 0 || VirtualHeight <= 0) {
-                return { 0.0f, 0.0f }; // 안전 보호: 0으로 나누기 방지
+                return { 0.0f, 0.0f };
             }
 
             auto widthRatio = (float)screenWidth / (float)VirtualWidth;
@@ -30,7 +30,7 @@ namespace Engine {
             float scale = std::min(widthRatio, heightRatio);
 
             if (scale <= 0.0f || !std::isfinite(scale)) {
-                return { 0.0f, 0.0f }; // 비정상적 스케일 방지
+                return { 0.0f, 0.0f };
             }
 
             float offsetX = (screenWidth  - (VirtualWidth  * scale)) * 0.5f;

@@ -12,12 +12,12 @@
 
 int main() {
 #ifdef NDEBUG
-    // 릴리즈 모드: 치명적인 에러만 출력하거나 아예 끔
+    // Release mode: output only fatal errors or disable logging entirely
     SetTraceLogLevel(LOG_FATAL); 
-    // SetTraceLogLevel(LOG_NONE); // 로그 끔
+    // SetTraceLogLevel(LOG_NONE); // disable logs
 #else
-    // 디버그 모드: 모든 정보/경고/에러 출력
-    SetTraceLogLevel(LOG_ALL);   // 또는 LOG_INFO
+    // Debug mode: output all info/warnings/errors
+    SetTraceLogLevel(LOG_ALL);   // or LOG_INFO
 #endif
 
     namespace ED = Engine::Display;
@@ -32,8 +32,8 @@ int main() {
     auto& resourceManager = ERM::Instance();
 
 #ifdef NDEBUG
-    // 릴리즈 모드
-    ChangeDirectory(GetApplicationDirectory()); // 실행 파일 위치 기준으로 작업 디렉터리 변경
+    // Release mode
+    ChangeDirectory(GetApplicationDirectory()); // Change working directory to executable location
 
     std::string resPathName = "resources";
     std::filesystem::path resPath = resPathName;
@@ -41,14 +41,14 @@ int main() {
         // resPath = std::filesystem::path(currentPrjDir) / resPathName;
     resourceManager.SetResourcePath(resPath);
 #else
-    // 디버그 모드
+    // Debug mode
     std::string resPathName = "resources";
-    auto currentPrjDir = CURRENT_PROJECT_DIR; // 현재 CMakeLists.txt 의 경로
+    auto currentPrjDir = CURRENT_PROJECT_DIR; // current CMakeLists.txt path
     std::filesystem::path resPath = std::filesystem::path(currentPrjDir) / resPathName;
     resourceManager.SetResourcePath(resPath);
 #endif
 
-    raylib::AudioDevice audioDevice; // 오디오 장치 초기화
+    raylib::AudioDevice audioDevice; // Initialize audio device
     if (!IsAudioDeviceReady()) {
 #ifdef __ANDROID__
         TraceLog(LOG_ERROR, "Failed to initialize audio device on Android!");
@@ -63,7 +63,7 @@ int main() {
         return -1;
     }
 
-    // 가상 화면 크기 설정
+    // Set virtual screen size
     display.VirtualWidth  = 800;
     display.VirtualHeight = 600;
 
@@ -71,11 +71,11 @@ int main() {
     const int virtualScreenHeight = display.VirtualHeight;
 
     auto configFlags =
-        FLAG_WINDOW_RESIZABLE | // 윈도우 크기 조절 가능
-        FLAG_VSYNC_HINT; // 수직 동기화 활성화
+        FLAG_WINDOW_RESIZABLE | // Allow window resizing
+        FLAG_VSYNC_HINT; // Enable vertical sync
     SetConfigFlags(configFlags);
 
-    // 윈도우 생성
+    // Create window
     auto windowName = "Raylib-CPP Scalable App";
     raylib::Window window(virtualScreenWidth, virtualScreenHeight, windowName);
 
@@ -83,39 +83,39 @@ int main() {
     SetTargetFPS(framePerSecond);
 
     raylib::RenderTexture2D target(virtualScreenWidth, virtualScreenHeight);
-    auto textureFilter = TEXTURE_FILTER_BILINEAR; // 선형 필터링 (bilinear filtering)
+    auto textureFilter = TEXTURE_FILTER_BILINEAR; // linear filtering (bilinear filtering)
     SetTextureFilter(target.GetTexture(), textureFilter);
 
-    ES::SceneManager sceneManager; // 씬 관리자
+    ES::SceneManager sceneManager; // Scene manager
 
-    // Scene 등록
+    // Register scenes
     sceneManager.RegisterScene<TitleScene>("Title");
     sceneManager.RegisterScene<GameplayScene>("Gameplay");
     sceneManager.RegisterScene<GameOverScene>("GameOver");
     sceneManager.RegisterScene<StageClearScene>("StageClear");
 
-    sceneManager.ChangeScene("Title"); // 최초 씬 설정    
+    sceneManager.ChangeScene("Title"); // Set initial scene    
 
     while (!window.ShouldClose()) {
-        // 현재 화면 크기 가져오기
+        // Get current screen size
         const int screenWidth  = GetScreenWidth();
         const int screenHeight = GetScreenHeight();
 
-        // 가상 화면 크기에 맞춰 스케일 계산
+        // Calculate scale to match virtual screen size
         auto scaleX = (float)screenWidth  / (float)virtualScreenWidth;
         auto scaleY = (float)screenHeight / (float)virtualScreenHeight;
         float scale = std::min(scaleX, scaleY);
 
-        // [1] 씬 로직 업데이트 (ClickableAreaManager 내부에서 보정 좌표 자동 사용)
-        //  NOTE: 씬 매니저의 Update() 가 Draw() 보다 먼저 호출됨.
+        // [1] Update scene logic (ClickableAreaManager internally uses corrected coordinates automatically)
+        //  NOTE: SceneManager's Update() is called before Draw().
         sceneManager.Update();
 
-        // [2] 가상 렌더 텍스처에 그리기
+        // [2] Draw to virtual render texture
         target.BeginMode();
             sceneManager.Draw();
         target.EndMode();
 
-        // [3] 레터박스 적용 후 화면에 렌더링
+        // [3] Apply letterboxing and render to screen
         window.BeginDrawing();
             raylib::Color::Black().ClearBackground();
 

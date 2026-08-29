@@ -13,12 +13,12 @@ namespace Engine {
         }
 
         void ClickableAreaManager::Update() { 
-            // 실제 창 해상도 대신 가상 캔버스(800x450) 기준 보정된 마우스 좌표 사용
+            // Use mouse coordinates adjusted to the virtual canvas (800x450) instead of the actual window resolution
 
-			namespace ED = Engine::Display;
-			using EDD = Engine::Display::Display;
+            namespace ED = Engine::Display;
+            using EDD = Engine::Display::Display;
 
-			raylib::Vector2 mousePos = EDD::Instance().GetVirtualMousePosition();
+            raylib::Vector2 mousePos = EDD::Instance().GetVirtualMousePosition();
             bool isClicked = raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_LEFT);
 
             for (auto& region : regions) {
