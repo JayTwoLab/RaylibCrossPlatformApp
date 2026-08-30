@@ -38,21 +38,17 @@ namespace Engine {
 
             region->sprite = sprite;
 
-            // 스프라이트를 bounds 영역에 맞게 설정
-            // bounds의 중심에 스프라이트 위치 설정
             raylib::Vector2 centerPos = {
                 region->bounds.x + region->bounds.width / 2.0f,
                 region->bounds.y + region->bounds.height / 2.0f
             };
             sprite->SetPosition(centerPos);
 
-            // 스프라이트의 스케일을 bounds 크기에 맞게 조정
-            // 스프라이트의 기본 크기를 기준으로 스케일 계산
             raylib::Rectangle spriteBounds = sprite->GetBounds();
             if (spriteBounds.width > 0 && spriteBounds.height > 0) {
                 float scaleX = region->bounds.width / spriteBounds.width;
                 float scaleY = region->bounds.height / spriteBounds.height;
-                // 비율을 유지하면서 작은 쪽으로 맞춤
+
                 float scale = scaleX < scaleY ? scaleX : scaleY;
                 sprite->SetScale(scale);
             }
@@ -61,11 +57,9 @@ namespace Engine {
         void ClickableAreaManager::SetRegionPosition(const std::string& id, const raylib::Vector2& newPosition) {
             ClickableRegion* region = FindRegionById(id);
             if (region) {
-                // bounds 위치 업데이트
                 region->bounds.x = newPosition.x;
                 region->bounds.y = newPosition.y;
 
-                // 스프라이트 위치도 동시에 업데이트
                 if (region->sprite) {
                     raylib::Vector2 centerPos = {
                         region->bounds.x + region->bounds.width / 2.0f,
@@ -142,7 +136,6 @@ namespace Engine {
             bool isClicked = raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_LEFT);
 
             for (auto& region : regions) {
-                // bounds와 마우스 위치로 호버 감지
                 region.isHovered = region.bounds.CheckCollision(mousePos);
 
                 if (region.sprite) {
@@ -160,17 +153,14 @@ namespace Engine {
 
         void ClickableAreaManager::Draw() const {
             for (const auto& region : regions) {
-                // 스프라이트 그리기
                 if (region.sprite) {
                     region.sprite->Draw();
                 }
 
-                // 텍스트 그리기
                 if (!region.text.empty()) {
                     int textWidth;
                     int textHeight;
 
-                    // 배경색 그리기
                     if (region.hasBackground) {
                         raylib::Rectangle textBgBounds = {
                             region.bounds.x,
@@ -181,9 +171,7 @@ namespace Engine {
                         textBgBounds.Draw(region.backgroundColor);
                     }
 
-                    // 커스텀 폰트 사용 여부에 따라 텍스트 크기 계산 및 렌더링
                     if (region.useCustomFont && region.font) {
-                        // raylib-cpp 래퍼 사용
                         raylib::Vector2 textSize = region.font->MeasureText(region.text.c_str(), static_cast<float>(region.fontSize), 1.0f);
                         textWidth = static_cast<int>(textSize.x);
                         textHeight = static_cast<int>(textSize.y);
