@@ -8,9 +8,10 @@ void StageClearScene::Init() {
     nextScene_ = "";
     clickManager_.Clear();
 
-    clickManager_.AddRegion("back_to_title", raylib::Rectangle{ 330, 250, 140, 50 }, [this]() {
-        this->nextScene_ = "Title";
-        });
+    clickManager_.AddRegion(
+        "back_to_title", raylib::Rectangle{ 330, 250, 140, 50 },
+        [this]() { this->nextScene_ = "Title"; });
+
 }
 
 void StageClearScene::Update() {
