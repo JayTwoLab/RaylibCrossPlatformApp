@@ -225,6 +225,7 @@ void TitleScene::Draw() {
     raylib::Rectangle(460, 250, 40, 40).Draw(raylib::Color::LightGray());
     raylib::DrawText("+", 472, 258, 24, raylib::Color::Black());
 
+    clickManager_.Draw();
     clickManager_.DrawDebug();
 }
 

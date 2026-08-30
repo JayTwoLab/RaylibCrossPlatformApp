@@ -25,6 +25,7 @@ void StageClearScene::Draw() {
     raylib::Rectangle(330, 250, 140, 50).Draw(raylib::Color::DarkBlue());
     raylib::DrawText("TITLE", 370, 265, 20, raylib::Color::White());
 
+    clickManager_.Draw();
     clickManager_.DrawDebug();
 }
 

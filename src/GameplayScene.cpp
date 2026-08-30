@@ -175,6 +175,7 @@ void GameplayScene::Draw() {
     raylib::Rectangle(220, 500, 150, 40).Draw(raylib::Color::Green());
     raylib::DrawText("Click: Add Score", 240, 512, 14, raylib::Color::Black());
 
+    clickManager_.Draw();
     clickManager_.DrawDebug();
 }
 
