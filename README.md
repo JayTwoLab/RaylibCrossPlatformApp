@@ -87,4 +87,7 @@ Platform notes:
 ```
 
 ## License
-See the [`LICENSE`](LICENSE) file at the repository root.
+- See the [`LICENSE`](LICENSE).
+- [raylib](https://github.com/raysan5/raylib) : `zlib license`
+- [raylib-cpp](https://github.com/RobLoach/raylib-cpp) : `zlib license`
+
