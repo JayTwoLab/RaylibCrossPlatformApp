@@ -23,9 +23,9 @@ void TitleScene::Init() {
     isDragging_ = false;
 
     // Register button click regions
-    clickManager_.AddRegion("start_button", raylib::Rectangle{ 300, 180, 200, 50 }, [this]() {
-        this->nextScene_ = "Gameplay";
-    });
+    clickManager_.AddRegion(
+        "start_button", raylib::Rectangle{ 300, 180, 200, 50 },
+        [this]() { this->nextScene_ = "Gameplay"; });
 
     clickManager_.AddRegion(
         "vol_down", // name
