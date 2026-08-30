@@ -13,11 +13,11 @@
 int main() {
 #ifdef NDEBUG
     // Release mode: output only fatal errors or disable logging entirely
-    SetTraceLogLevel(LOG_FATAL); 
-    // SetTraceLogLevel(LOG_NONE); // disable logs
+    ::SetTraceLogLevel(LOG_FATAL);
+    // ::SetTraceLogLevel(LOG_NONE); // disable logs
 #else
     // Debug mode: output all info/warnings/errors
-    SetTraceLogLevel(LOG_ALL);   // or LOG_INFO
+    ::SetTraceLogLevel(LOG_ALL);   // or LOG_INFO
 #endif
 
     namespace ED = Engine::Display;
@@ -33,7 +33,7 @@ int main() {
 
 #ifdef NDEBUG
     // Release mode
-    ChangeDirectory(GetApplicationDirectory()); // Change working directory to executable location
+    ::ChangeDirectory(::GetApplicationDirectory()); // Change working directory to executable location
 
     std::string resPathName = "resources";
     std::filesystem::path resPath = resPathName;
@@ -49,7 +49,7 @@ int main() {
 #endif
 
     raylib::AudioDevice audioDevice; // Initialize audio device
-    if (!IsAudioDeviceReady()) {
+    if (!::IsAudioDeviceReady()) {
 #ifdef __ANDROID__
         TraceLog(LOG_ERROR, "Failed to initialize audio device on Android!");
         TraceLog(LOG_WARNING, "Check microphone permissions in AndroidManifest.xml");
@@ -62,6 +62,8 @@ int main() {
 #endif
         return -1;
     }
+    auto masterVolume = 0.5f; 
+    ::SetMasterVolume(masterVolume); // Set master volume to 50%
 
     // Set virtual screen size
     display.VirtualWidth  = 800;
@@ -73,18 +75,18 @@ int main() {
     auto configFlags =
         FLAG_WINDOW_RESIZABLE | // Allow window resizing
         FLAG_VSYNC_HINT; // Enable vertical sync
-    SetConfigFlags(configFlags);
+    ::SetConfigFlags(configFlags);
 
     // Create window
     auto windowName = "Raylib-CPP Scalable App";
     raylib::Window window(virtualScreenWidth, virtualScreenHeight, windowName);
 
     int framePerSecond = 60;
-    SetTargetFPS(framePerSecond);
+    ::SetTargetFPS(framePerSecond);
 
     raylib::RenderTexture2D target(virtualScreenWidth, virtualScreenHeight);
     auto textureFilter = TEXTURE_FILTER_BILINEAR; // linear filtering (bilinear filtering)
-    SetTextureFilter(target.GetTexture(), textureFilter);
+    ::SetTextureFilter(target.GetTexture(), textureFilter);
 
     ES::SceneManager sceneManager; // Scene manager
 
