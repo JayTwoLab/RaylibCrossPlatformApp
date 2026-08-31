@@ -8,8 +8,6 @@
 #include "GameOverScene.hpp"
 #include "StageClearScene.hpp"
 
-#include "GenerateTestAssets.hpp"
-
 int main() {
 #ifdef NDEBUG
     // Release mode: output only fatal errors or disable logging entirely

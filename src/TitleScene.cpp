@@ -1,5 +1,5 @@
-#include "TitleScene.hpp"
 #include <cassert>
+#include "TitleScene.hpp"
 
 TitleScene::TitleScene() {
 }
