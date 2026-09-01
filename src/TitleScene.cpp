@@ -157,7 +157,7 @@ void TitleScene::Update() {
         }
     }
 
-    // On right click (no right-click on Android touch screens)
+    // Right click (no right-click on Android touch screens)
     if (raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_RIGHT)) {
         // Console output (for debugging)
         bool nonVirtualArea = false;
@@ -179,7 +179,7 @@ void TitleScene::Update() {
         }
     }
 
-    // On right-click release (no right-click on Android touch screens)
+    // Right-click release (no right-click on Android touch screens)
     if (raylib::Mouse::IsButtonReleased(MOUSE_BUTTON_RIGHT)) {
         // Console output (for debugging)
         bool nonVirtualArea = false;
