@@ -8,7 +8,7 @@
 #include "GameOverScene.hpp"
 #include "StageClearScene.hpp"
 
-int main() {
+int main(int argc, char** argv) {
 #ifdef NDEBUG
     // Release mode: output only fatal errors or disable logging entirely
     ::SetTraceLogLevel(LOG_FATAL);
