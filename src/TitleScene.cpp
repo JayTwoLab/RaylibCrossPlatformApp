@@ -201,6 +201,10 @@ void TitleScene::Update() {
         }
     }
 
+    // Right arrow key pressed (for testing)
+    if (raylib::Keyboard::IsKeyPressed(KEY_RIGHT)) {
+        TraceLog(LOG_INFO, "[TitleScene] Right Arrow Key is down.");
+    }
 }
 
 void TitleScene::Draw() {
