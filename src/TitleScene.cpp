@@ -208,7 +208,8 @@ void TitleScene::Update() {
 }
 
 void TitleScene::Draw() {
-    raylib::Color::RayWhite().ClearBackground();
+    //raylib::Color::RayWhite().ClearBackground();
+    raylib::Color::Black().ClearBackground();
     raylib::DrawText("MAIN MENU", 320, 100, 32, raylib::Color::DarkBlue());
 
     // Render drag box
