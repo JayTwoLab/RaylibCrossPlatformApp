@@ -230,7 +230,7 @@ void TitleScene::Draw() {
     raylib::DrawText("+", 472, 258, 24, raylib::Color::Black());
 
     clickManager_.Draw();
-    clickManager_.DrawDebug();
+    clickManager_.DrawBoundary();
 }
 
 void TitleScene::Unload() {

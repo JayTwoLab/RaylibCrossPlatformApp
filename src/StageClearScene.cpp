@@ -26,7 +26,7 @@ void StageClearScene::Draw() {
     raylib::DrawText("TITLE", 370, 265, 20, raylib::Color::White());
 
     clickManager_.Draw();
-    clickManager_.DrawDebug();
+    clickManager_.DrawBoundary();
 }
 
 void StageClearScene::Unload() {

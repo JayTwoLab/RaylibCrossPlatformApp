@@ -43,7 +43,7 @@ namespace Engine {
             void Clear();
             void Update();
             void Draw() const;
-            void DrawDebug() const;
+            void DrawBoundary() const;
         };
 
     } // namespace UI

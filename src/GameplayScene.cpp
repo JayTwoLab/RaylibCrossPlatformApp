@@ -176,7 +176,7 @@ void GameplayScene::Draw() {
     raylib::DrawText("Click: Add Score", 240, 512, 14, raylib::Color::Black());
 
     clickManager_.Draw();
-    clickManager_.DrawDebug();
+    clickManager_.DrawBoundary();
 }
 
 void GameplayScene::Unload() {

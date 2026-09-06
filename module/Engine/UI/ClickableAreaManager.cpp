@@ -193,7 +193,7 @@ namespace Engine {
             }
         }
 
-        void ClickableAreaManager::DrawDebug() const {
+        void ClickableAreaManager::DrawBoundary() const {
             for (const auto& region : regions) {
                 raylib::Color color = region.isHovered ? raylib::Color::Yellow() : raylib::Color::Lime();
 

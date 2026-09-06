@@ -66,7 +66,7 @@ void GameOverScene::Draw() {
     raylib::DrawText("GAME OVER", 280, 150, 40, raylib::Color::White());
 
     clickManager_.Draw(); // draw sprite in clickable area
-    clickManager_.DrawDebug(); // draw debug rectangles for clickable areas
+    clickManager_.DrawBoundary(); // draw debug rectangles for clickable areas
 }
 
 void GameOverScene::Unload() {
