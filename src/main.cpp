@@ -64,10 +64,11 @@ int main(int argc, char** argv) {
     ::SetMasterVolume(masterVolume); // Set master volume to 50%
 
     // Set virtual screen size
-    display.VirtualWidth  = 800; display.VirtualHeight = 600;
-    // display.VirtualWidth = 1024; display.VirtualHeight = 768;
-    // display.VirtualWidth = 1920; display.VirtualHeight = 1080; // Full HD resolution
-    // display.VirtualWidth = 3840; display.VirtualHeight = 2160; // 4K resolution
+    // display.VirtualWidth  = 800; display.VirtualHeight = 600; // ratio 4:3
+    // display.VirtualWidth = 1024; display.VirtualHeight = 768; // ratio 4:3
+    display.VirtualWidth = 1280; display.VirtualHeight = 720; // ratio 16:9
+    // display.VirtualWidth = 1920; display.VirtualHeight = 1080; // Full HD resolution // ratio 16:9
+    // display.VirtualWidth = 3840; display.VirtualHeight = 2160; // 4K resolution // ratio 16:9
 
     const int virtualScreenWidth  = display.VirtualWidth;
     const int virtualScreenHeight = display.VirtualHeight;
@@ -96,8 +97,8 @@ int main(int argc, char** argv) {
     ::SetConfigFlags(configFlags);
 
     // Create window
-    auto windowName = "Raylib-CPP Scalable App";
-    raylib::Window window(virtualScreenWidth, virtualScreenHeight, windowName);
+    std::string windowName = "Raylib-CPP Scalable App";
+    raylib::Window window(virtualScreenWidth, virtualScreenHeight, windowName.c_str());
 
     int framePerSecond = 60;
     ::SetTargetFPS(framePerSecond);
