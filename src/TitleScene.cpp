@@ -208,8 +208,8 @@ void TitleScene::Update() {
 }
 
 void TitleScene::Draw() {
-    //raylib::Color::RayWhite().ClearBackground();
-    raylib::Color::Black().ClearBackground();
+    raylib::Color::RayWhite().ClearBackground();
+    // raylib::Color::Black().ClearBackground();
     raylib::DrawText("MAIN MENU", 320, 100, 32, raylib::Color::DarkBlue());
 
     // Render drag box
@@ -225,7 +225,8 @@ void TitleScene::Draw() {
     raylib::DrawText("-", 315, 258, 24, raylib::Color::Black());
 
     auto volume_percent = static_cast<int>(soundVolume_ * 100);
-    raylib::DrawText(TextFormat("Volume: %d%%", volume_percent), 355, 260, 15, raylib::Color::DarkGray());
+    auto volume_text = TextFormat("Volume: %d%%", volume_percent);
+    raylib::DrawText(volume_text, 355, 260, 15, raylib::Color::DarkGray());
 
     raylib::Rectangle(460, 250, 40, 40).Draw(raylib::Color::LightGray());
     raylib::DrawText("+", 472, 258, 24, raylib::Color::Black());

@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <filesystem>
 #include "raylib-cpp.hpp" // raylib-cpp 
-#include "Engine/Engine.hpp" // module
+#include "Engine/Engine.hpp" // module/
 
 #include "TitleScene.hpp"
 #include "GameplayScene.hpp"
@@ -172,10 +172,10 @@ int main(int argc, char** argv) {
             auto tint_draw = raylib::Color::White();
             target.GetTexture().Draw(srcRect, destRect, origin_draw, rotation_draw, tint_draw);
 
-            if (IsKeyPressed(KEY_ESCAPE)) {
-                // ESC key pressed:
-                TraceLog(LOG_INFO, "ESC key pressed...");
-            }
+            // if (IsKeyPressed(KEY_ESCAPE)) {
+            //    // ESC key pressed:
+            //    TraceLog(LOG_INFO, "ESC key pressed...");
+            // }
 
         }
         window.EndDrawing();

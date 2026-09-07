@@ -6,6 +6,15 @@
 #include "Engine/Graphics/RotatingSprite.hpp"
 
 class GameplayScene : public Engine::Scene::Scene {
+public:
+    GameplayScene();
+
+    void Init() override;
+    void Update() override;
+    void Draw() override;
+    void Unload() override;
+    std::string GetNextScene() override;
+
 private:
     Engine::UI::ClickableAreaManager clickManager_;
 
@@ -19,14 +28,4 @@ private:
     int score_;
 
     void ResetFields();
-
-public:
-    GameplayScene();
-
-    void Init() override;
-    void Update() override;
-    void Draw() override;
-    void Unload() override;
-
-    std::string GetNextScene() override;
 };

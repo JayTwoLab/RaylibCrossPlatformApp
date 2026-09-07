@@ -9,6 +9,15 @@
 #include "Engine/Engine.hpp"
 
 class TitleScene : public Engine::Scene::Scene {
+public:
+    TitleScene(); 
+
+    void Init() override;
+    void Update() override;
+    void Draw() override;
+    void Unload() override;
+    std::string GetNextScene() override;
+
 private:
     raylib::Music bgm_; // background music
     float soundVolume_ = 0.5; // sound volume (0.0 ~ 1.0)
@@ -22,14 +31,4 @@ private:
     raylib::Rectangle dragBox_ = { 100, 100, 120, 80 }; // box to drag
     bool isDragging_ = false;                           // dragging state flag
     raylib::Vector2 dragOffset_ = { 0.0f, 0.0f };       // mouse click offset
-
-public:
-    TitleScene(); 
-
-    void Init() override;
-    void Update() override;
-    void Draw() override;
-    void Unload() override;
-
-    std::string GetNextScene() override;
 };
