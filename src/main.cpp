@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <filesystem>
-#include "raylib-cpp.hpp" // raylib-cpp 
-#include "Engine/Engine.hpp" // module/
+#include "raylib-cpp.hpp"
+#include "Engine/Engine.hpp"
 
 #include "TitleScene.hpp"
 #include "GameplayScene.hpp"
@@ -10,12 +10,11 @@
 
 int main(int argc, char** argv) {
 #ifdef NDEBUG
-    // Release mode: output only fatal errors or disable logging entirely
+    // Release 모드: 치명적 오류만 출력하거나 로깅 억제
     ::SetTraceLogLevel(LOG_FATAL);
-    // ::SetTraceLogLevel(LOG_NONE); // disable logs
 #else
-    // Debug mode: output all info/warnings/errors
-    ::SetTraceLogLevel(LOG_ALL);   // or LOG_INFO
+    // Debug 모드: 모든 로그 출력
+    ::SetTraceLogLevel(LOG_ALL);
 #endif
 
     namespace ED = Engine::Display;
@@ -29,24 +28,35 @@ int main(int argc, char** argv) {
     using ERM = ER::ResourceManager;
     auto& resourceManager = ERM::Instance();
 
+    // =========================================================================
+    // 리소스 경로 설정 (USE_RRES 플래그 유무에 따른 자동 분기)
+    // =========================================================================
+#if defined(USE_RRES)
+    // rres 패키지 모드: 단일 아카이브 파일 경로 설정
 #ifdef NDEBUG
-    // Release mode
-    ::ChangeDirectory(::GetApplicationDirectory()); // Change working directory to executable location
-
-    std::string resPathName = "resources";
-    std::filesystem::path resPath = resPathName;
-        // auto currentPrjDir = CURRENT_PROJECT_DIR;
-        // resPath = std::filesystem::path(currentPrjDir) / resPathName;
-    resourceManager.SetResourcePath(resPath);
+    ::ChangeDirectory(::GetApplicationDirectory());
+    resourceManager.SetResourcePath("resources.rres");
 #else
-    // Debug mode
+    auto currentPrjDir = CURRENT_PROJECT_DIR;
+    std::filesystem::path pkgPath = std::filesystem::path(currentPrjDir) / "resources.rres";
+    resourceManager.SetResourcePath(pkgPath);
+#endif
+#else
+    // 일반 디스크 모드: resources 폴더 경로 설정
+#ifdef NDEBUG
+    ::ChangeDirectory(::GetApplicationDirectory());
     std::string resPathName = "resources";
-    auto currentPrjDir = CURRENT_PROJECT_DIR; // current CMakeLists.txt path
+    resourceManager.SetResourcePath(resPathName);
+#else
+    std::string resPathName = "resources";
+    auto currentPrjDir = CURRENT_PROJECT_DIR;
     std::filesystem::path resPath = std::filesystem::path(currentPrjDir) / resPathName;
     resourceManager.SetResourcePath(resPath);
 #endif
+#endif
 
-    raylib::AudioDevice audioDevice; // Initialize audio device
+    // 오디오 디바이스 초기화
+    raylib::AudioDevice audioDevice;
     if (!::IsAudioDeviceReady()) {
 #ifdef __ANDROID__
         TraceLog(LOG_ERROR, "Failed to initialize audio device on Android!");
@@ -60,123 +70,85 @@ int main(int argc, char** argv) {
 #endif
         return -1;
     }
-    auto masterVolume = 0.5f; 
-    ::SetMasterVolume(masterVolume); // Set master volume to 50%
+    auto masterVolume = 0.5f;
+    ::SetMasterVolume(masterVolume);
 
-    // Set virtual screen size
-    // display.VirtualWidth  = 800; display.VirtualHeight = 600; // ratio 4:3
-    // display.VirtualWidth = 1024; display.VirtualHeight = 768; // ratio 4:3
-    display.VirtualWidth = 1280; display.VirtualHeight = 720; // ratio 16:9
-    // display.VirtualWidth = 1920; display.VirtualHeight = 1080; // Full HD resolution // ratio 16:9
-    // display.VirtualWidth = 3840; display.VirtualHeight = 2160; // 4K resolution // ratio 16:9
+    // 가상 해상도 설정 (16:9 기준)
+    display.VirtualWidth = 1280;
+    display.VirtualHeight = 720;
 
-    const int virtualScreenWidth  = display.VirtualWidth;
+    const int virtualScreenWidth = display.VirtualWidth;
     const int virtualScreenHeight = display.VirtualHeight;
 
-    unsigned int configFlags =
-        FLAG_WINDOW_RESIZABLE | // Allow window resizing
-       //  FLAG_FULLSCREEN_MODE | // Start in fullscreen mode
-        FLAG_VSYNC_HINT; // Enable vertical sync
-    // 
-    // FLAG_VSYNC_HINT           // Set to try enabling V-Sync on GPU
-    // FLAG_FULLSCREEN_MODE      // Set to run program in fullscreen
-    // FLAG_WINDOW_RESIZABLE     // Set to allow resizable window
-    // FLAG_WINDOW_UNDECORATED   // Set to disable window decoration (frame and buttons)
-    // FLAG_WINDOW_HIDDEN        // Set to hide window
-    // FLAG_WINDOW_MINIMIZED     // Set to minimize window (iconify)
-    // FLAG_WINDOW_MAXIMIZED     // Set to maximize window (expanded to monitor)
-    // FLAG_WINDOW_UNFOCUSED     // Set to window non focused
-    // FLAG_WINDOW_TOPMOST       // Set to window always on top
-    // FLAG_WINDOW_ALWAYS_RUN    // Set to allow windows running while minimized
-    // FLAG_WINDOW_TRANSPARENT    // Set to allow transparent framebuffer
-    // FLAG_WINDOW_HIGHDPI        // Set to support HighDPI
-    // FLAG_WINDOW_MOUSE_PASSTHROUGH // Set to support mouse passthrough, only supported when  G_WINDOW_UNDECORATED
-    // FLAG_BORDERLESS_WINDOWED_MODE // Set to run program in borderless windowed mode
-    // FLAG_MSAA_4X_HINT           // Set to try enabling MSAA 4X
-    // FLAG_INTERLACED_HINT        // Set to try enabling interlaced video format (for V3D)
+    unsigned int configFlags = FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT;
     ::SetConfigFlags(configFlags);
 
-    // Create window
+    // 윈도우 생성
     std::string windowName = "Raylib-CPP Scalable App";
     raylib::Window window(virtualScreenWidth, virtualScreenHeight, windowName.c_str());
 
     int framePerSecond = 60;
     ::SetTargetFPS(framePerSecond);
 
+    // 가상 해상도 렌더 텍스처
     raylib::RenderTexture2D target(virtualScreenWidth, virtualScreenHeight);
+    ::SetTextureFilter(target.GetTexture(), TEXTURE_FILTER_BILINEAR);
 
-    int textureFilter = TEXTURE_FILTER_BILINEAR; // linear filtering (bilinear filtering)
-    //  TEXTURE_FILTER_BILINEAR        // Linear filtering
-    //  TEXTURE_FILTER_TRILINEAR       // Trilinear filtering (linear with mipmaps)
-    //  TEXTURE_FILTER_ANISOTROPIC_4X  // Anisotropic filtering 4x
-    //  TEXTURE_FILTER_ANISOTROPIC_8X  // Anisotropic filtering 8x
-    //  TEXTURE_FILTER_ANISOTROPIC_16X // Anisotropic filtering 16x
-    ::SetTextureFilter(target.GetTexture(), textureFilter);
-
-    ES::SceneManager sceneManager; // Scene manager
-
-    // Register scenes
+    // 씬 매니저 초기화 및 씬 등록
+    ES::SceneManager sceneManager;
     sceneManager.RegisterScene<TitleScene>("Title");
     sceneManager.RegisterScene<GameplayScene>("Gameplay");
     sceneManager.RegisterScene<GameOverScene>("GameOver");
     sceneManager.RegisterScene<StageClearScene>("StageClear");
 
-    sceneManager.ChangeScene("Title"); // Set initial scene
+    sceneManager.ChangeScene("Title");
 
-    // Skip ESC key to exit the application (to avoid accidental exits)
+    // ESC 키로 즉시 종료되는 기본 동작 방지
     SetExitKey(KEY_NULL);
 
+    // 메인 루프
     while (!window.ShouldClose()) {
-        // Get current screen size
-        const int screenWidth  = GetScreenWidth();
+        const int screenWidth = GetScreenWidth();
         const int screenHeight = GetScreenHeight();
 
-        // Calculate scale to match virtual screen size
-        auto scaleX = (float)screenWidth  / (float)virtualScreenWidth;
-        auto scaleY = (float)screenHeight / (float)virtualScreenHeight;
+        // 화면 비율 계산 (레터박스 스케일링)
+        auto scaleX = static_cast<float>(screenWidth) / static_cast<float>(virtualScreenWidth);
+        auto scaleY = static_cast<float>(screenHeight) / static_cast<float>(virtualScreenHeight);
         float scale = std::min(scaleX, scaleY);
 
-        // [1] Update scene logic (ClickableAreaManager internally uses corrected coordinates automatically)
-        //  NOTE: SceneManager's Update() is called before Draw().
+        // [1] 씬 로직 업데이트
         sceneManager.Update();
 
-        // [2] Draw to virtual render texture
+        // [2] 가상 캔버스(RenderTexture)에 렌더링
         target.BeginMode();
         {
             sceneManager.Draw();
         }
         target.EndMode();
 
-        // [3] Apply letterboxing and render to screen
+        // [3] 레터박스 적용 후 실제 윈도우 화면에 그리기
         window.BeginDrawing();
         {
             raylib::Color::Black().ClearBackground();
 
             raylib::Rectangle srcRect = {
-                0.0f, // Left
-                0.0f, // Top
-                (float)target.GetTexture().width, // Right
-                -(float)target.GetTexture().height // Bottom (negative to flip vertically)
+                0.0f,
+                0.0f,
+                static_cast<float>(target.GetTexture().width),
+                -static_cast<float>(target.GetTexture().height) // OpenGL 좌표계 뒤집힘 보정
             };
 
             raylib::Rectangle destRect = {
-                (screenWidth - (virtualScreenWidth * scale)) * 0.5f, // Center horizontally
-                (screenHeight - (virtualScreenHeight * scale)) * 0.5f, // Center vertically
-                virtualScreenWidth * scale, // Width scaled
-                virtualScreenHeight * scale // Height scaled
+                (screenWidth - (virtualScreenWidth * scale)) * 0.5f,
+                (screenHeight - (virtualScreenHeight * scale)) * 0.5f,
+                virtualScreenWidth * scale,
+                virtualScreenHeight * scale
             };
 
-            // Draw the render texture to the screen with scaling and letterboxing
             auto origin_draw = raylib::Vector2{ 0, 0 };
             auto rotation_draw = 0.0f;
             auto tint_draw = raylib::Color::White();
             target.GetTexture().Draw(srcRect, destRect, origin_draw, rotation_draw, tint_draw);
-
-            // if (IsKeyPressed(KEY_ESCAPE)) {
-            //    // ESC key pressed:
-            //    TraceLog(LOG_INFO, "ESC key pressed...");
-            // }
-
         }
         window.EndDrawing();
     }

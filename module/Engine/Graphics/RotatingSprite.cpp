@@ -1,4 +1,5 @@
 #include "Engine/Graphics/RotatingSprite.hpp"
+#include "Engine/Resource/ResourceManager.hpp"
 #include <utility>
 
 namespace Engine {
@@ -25,8 +26,8 @@ namespace Engine {
                 }
             }
 
-            raylib::Texture2D tex;
-            tex.Load(filePath);
+            // 디스크 모드와 rres 모드 모두 투명하게 지원
+            raylib::Texture2D tex = Engine::Resource::ResourceManager::Instance().LoadTexture(filePath);
             if (tex.id <= 0) return false;
 
             SetTextureFilter(tex, TEXTURE_FILTER_BILINEAR);

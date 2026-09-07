@@ -20,7 +20,6 @@ endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
  
-
 # ------------------------------------------------------------------------------
 # 1. Executable Name Configuration
 # ------------------------------------------------------------------------------
@@ -47,6 +46,9 @@ endif()
 # ------------------------------------------------------------------------------
 find_package(raylib REQUIRED)
 
+# rres 활성화 여부를 결정하는 옵션 정의 (기본값 OFF)
+option(ENABLE_RRES "Build with rres resource packaging" OFF)
+
 # ------------------------------------------------------------------------------
 # 4. Target Creation (Executable / Library)
 # ------------------------------------------------------------------------------
@@ -58,13 +60,18 @@ else()
     add_executable(${EXE_NAME} ${SOURCES})
 endif()
 
-# Copy resources/ to build directory after building the target 
-# include(CopyResources.cmake)
-# add_copy_resources(${EXE_NAME}) 
+# 옵션이 켜져 있을 때만 USE_RRES 전처리기 매크로 정의
+if(ENABLE_RRES)
+    target_compile_definitions(${EXE_NAME} PRIVATE USE_RRES)
+    message(STATUS "RRES Mode: ENABLED (USE_RRES defined)")
+else()
+    message(STATUS "RRES Mode: DISABLED (Disk mode)")
+endif()
 
 target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/raylib-cpp")
 target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/module")
+target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rres")
 
 target_link_libraries(${EXE_NAME} PRIVATE raylib)
 
