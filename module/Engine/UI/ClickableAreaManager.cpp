@@ -19,6 +19,7 @@ namespace Engine {
             region.bounds = bounds;
             region.onClick = onClick;
             region.isHovered = false;
+            region.isPressed = false; // 초기화
             region.sprite = nullptr;
             region.text = "";
             region.textColor = raylib::Color::Black();
@@ -126,27 +127,51 @@ namespace Engine {
             regions.clear();
         }
 
-        void ClickableAreaManager::Update() { 
-            // Use mouse coordinates adjusted to the virtual canvas (800x450) instead of the actual window resolution
-
+        void ClickableAreaManager::Update() {
             namespace ED = Engine::Display;
             using EDD = Engine::Display::Display;
 
             raylib::Vector2 mousePos = EDD::Instance().GetVirtualMousePosition();
-            bool isClicked = raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_LEFT);
+            bool isButtonDown = raylib::Mouse::IsButtonDown(MOUSE_BUTTON_LEFT);
+            bool isButtonReleased = raylib::Mouse::IsButtonReleased(MOUSE_BUTTON_LEFT);
 
             for (auto& region : regions) {
                 region.isHovered = region.bounds.CheckCollision(mousePos);
 
-                if (region.sprite) {
-                    region.sprite->Update();
+                if (region.isHovered) {
+                    // 영역 안에서 마우스 버튼을 누르고 있는 경우
+                    if (isButtonDown) {
+                        if (!region.isPressed) {
+                            region.isPressed = true;
+                            if (region.sprite) {
+                                region.sprite->SetClipState("pressed");
+                            }
+                        }
+                    }
+
+                    // 마우스를 뗐을 때: 클릭 콜백 실행 후 기본 상태 복귀
+                    if (isButtonReleased && region.isPressed) {
+                        region.isPressed = false;
+                        if (region.sprite) {
+                            region.sprite->SetClipState("idle");
+                        }
+                        if (region.onClick) {
+                            region.onClick();
+                        }
+                    }
+                }
+                else {
+                    // 마우스가 영역 밖으로 벗어난 경우 기본 상태로 리셋
+                    if (region.isPressed) {
+                        region.isPressed = false;
+                        if (region.sprite) {
+                            region.sprite->SetClipState("idle");
+                        }
+                    }
                 }
 
-                if (region.isHovered && isClicked) {
-                    if (region.onClick) {
-                        region.onClick();
-                    }
-                    break;
+                if (region.sprite) {
+                    region.sprite->Update();
                 }
             }
         }
@@ -195,17 +220,18 @@ namespace Engine {
 
         void ClickableAreaManager::DrawBoundary() const {
             for (const auto& region : regions) {
-                raylib::Color color = region.isHovered ? raylib::Color::Yellow() : raylib::Color::Lime();
+                if (region.isHovered) {
+                    raylib::Rectangle shadowBounds = {
+                        region.bounds.x - 1.0f,
+                        region.bounds.y - 1.0f,
+                        region.bounds.width + 2.0f,
+                        region.bounds.height + 2.0f
+                    };
+                    shadowBounds.DrawLines(raylib::Color::Black(), 1.0f);
 
-                raylib::Rectangle shadowBounds = {
-                    region.bounds.x - 1.0f,
-                    region.bounds.y - 1.0f,
-                    region.bounds.width + 2.0f,
-                    region.bounds.height + 2.0f
-                };
-                shadowBounds.DrawLines(raylib::Color::Black(), 1.0f);
-
-                region.bounds.DrawLines(color, 2.0f);
+                    raylib::Color hoverColor = raylib::Color::Yellow();
+                    region.bounds.DrawLines(hoverColor, 2.0f);
+                }
             }
         }
 

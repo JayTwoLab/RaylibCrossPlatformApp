@@ -5,6 +5,9 @@ TitleScene::TitleScene() {
 }
 
 void TitleScene::Init() {
+    namespace ER = Engine::Resource;
+    auto& resourceManager = ER::ResourceManager::Instance();
+
     nextScene_ = "";
     clickManager_.Clear();
 
@@ -13,9 +16,18 @@ void TitleScene::Init() {
 
     // 1. 버튼 등록
     clickManager_.AddRegion(
-        "start_button", raylib::Rectangle{ 300, 180, 200, 50 },
+        "start_button", raylib::Rectangle{ 300, 180, 100, 42 },
         [this]() { this->nextScene_ = "Gameplay"; }
     );
+
+    // 2. 버튼용 스프라이트 생성 및 기본/클릭 이미지 등록
+    auto buttonSprite = std::make_shared<Engine::Graphics::RotatingSprite>();
+    buttonSprite->RegisterClip("idle", "button_normal.png");
+    buttonSprite->RegisterClip("pressed", "button_clicked.png");
+    buttonSprite->SetClipState("idle");
+
+    // 3. 영역에 스프라이트 바인딩
+    clickManager_.SetRegionSprite("start_button", buttonSprite);
 
     clickManager_.AddRegion(
         "vol_down", raylib::Rectangle{ 300, 250, 40, 40 },
@@ -40,7 +52,7 @@ void TitleScene::Init() {
     );
 
     // 2. BGM 로드 (ResourceManager 경유)
-    bgm_ = Engine::Resource::ResourceManager::Instance().LoadMusic("background.mp3");
+    bgm_ = resourceManager.LoadMusic("background.mp3");
     soundVolume_ = 0.5f;
     bgm_.SetVolume(soundVolume_);
     bgm_.Play();
@@ -48,7 +60,7 @@ void TitleScene::Init() {
     // 3. SFX 로드 (ResourceManager 경유)
     sounds_.insert_or_assign(
         "click",
-        Engine::Resource::ResourceManager::Instance().LoadSound("click.wav")
+        resourceManager.LoadSound("click.wav")
     );
 
     for (auto& snd : sounds_) {
@@ -57,9 +69,10 @@ void TitleScene::Init() {
 }
 
 void TitleScene::Update() {
+    auto& display = Engine::Display::Display::Instance();
+
     bgm_.Update();
 
-    auto& display = Engine::Display::Display::Instance();
     clickManager_.Update();
 
     raylib::Vector2 mousePos = display.GetVirtualMousePosition();
@@ -91,8 +104,8 @@ void TitleScene::Draw() {
     dragBox_.Draw(boxColor);
     raylib::DrawText("Drag Me!", (int)dragBox_.x + 20, (int)dragBox_.y + 30, 20, raylib::Color::White());
 
-    raylib::Rectangle(300, 180, 200, 50).Draw(raylib::Color::SkyBlue());
-    raylib::DrawText("START GAME", 335, 195, 20, raylib::Color::DarkBlue());
+    // raylib::Rectangle(300, 180, 200, 50).Draw(raylib::Color::SkyBlue());
+    // raylib::DrawText("START GAME", 335, 195, 20, raylib::Color::DarkBlue());
 
     raylib::Rectangle(300, 250, 40, 40).Draw(raylib::Color::LightGray());
     raylib::DrawText("-", 315, 258, 24, raylib::Color::Black());

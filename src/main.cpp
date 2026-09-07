@@ -25,8 +25,8 @@ int main(int argc, char** argv) {
     using EDD = ED::Display;
     auto& display = EDD::Instance();
 
-    using ERM = ER::ResourceManager;
-    auto& resourceManager = ERM::Instance();
+    using ERR = ER::ResourceManager;
+    auto& resourceManager = ERR::Instance();
 
     // =========================================================================
     // 리소스 경로 설정 (USE_RRES 플래그 유무에 따른 자동 분기)

@@ -15,6 +15,7 @@ namespace Engine {
             raylib::Rectangle bounds;
             std::function<void()> onClick;
             bool isHovered;
+            bool isPressed; // 추가: 마우스 클릭 유지 여부
             std::shared_ptr<Engine::Graphics::RotatingSprite> sprite;
             std::string text;
             raylib::Color textColor;
