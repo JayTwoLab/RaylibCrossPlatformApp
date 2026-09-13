@@ -1,26 +1,26 @@
 #if defined(USE_RRES)
-#define RRES_IMPLEMENTATION
-#include "rres.h"
-#define RRES_RAYLIB_IMPLEMENTATION
-#include "rres-raylib.h"
+#   define RRES_IMPLEMENTATION
+#   include "rres.h"
+#   define RRES_RAYLIB_IMPLEMENTATION
+#   include "rres-raylib.h"
 #endif
 
 #include "Engine/Resource/ResourceManager.hpp"
 
 // Platform identification
 #if defined(_WIN32)
-#define PLATFORM_WINDOWS
+#   define PLATFORM_WINDOWS
 #elif defined(__ANDROID__)
-#define PLATFORM_ANDROID
+#   define PLATFORM_ANDROID
 #elif defined(__APPLE__)
-#include <TargetConditionals.h>
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#define PLATFORM_IOS
-#else
-#define PLATFORM_MACOS
-#endif
+#   include <TargetConditionals.h>
+#   if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#       define PLATFORM_IOS
+#   else
+#       define PLATFORM_MACOS
+#   endif
 #elif defined(__linux__)
-#define PLATFORM_LINUX
+#   define PLATFORM_LINUX
 #endif
 
 namespace Engine {
