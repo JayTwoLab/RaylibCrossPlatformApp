@@ -11,20 +11,18 @@ namespace Engine {
             Scene() = default;
             virtual ~Scene() = default;
 
-            // Scene lifecycle functions
-            virtual void Init() = 0; // Initialize the scene
-            virtual void Unload() = 0; // Unload the scene
+            virtual void Init() = 0;
+            virtual void Unload() = 0;
 
-            // Loop functions
-            virtual void Update() = 0; // Update the scene logic. Upload() is called before Draw(). 
-            virtual void Draw() = 0; // Draw the scene
+            virtual void Update() = 0;
+            virtual void Draw() = 0;
 
-            // Scene transition functions
+            virtual void DrawImGui() {}
+
             virtual std::string GetNextScene() = 0;
 
         protected:
-            std::string nextScene_{""}; // Next scene name
-
+            std::string nextScene_{ "" };
         };
 
     } // namespace Scene

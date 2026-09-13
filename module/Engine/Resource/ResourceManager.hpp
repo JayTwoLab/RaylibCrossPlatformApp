@@ -1,14 +1,13 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 #include <filesystem>
 #include <memory>
 #include <vector>
 #include "raylib-cpp.hpp"
 
 #if defined(USE_RRES)
-#include "rres.h"
+#   include "rres.h"
 #endif
 
 namespace Engine {
@@ -29,18 +28,15 @@ namespace Engine {
             bool Init();
             void Shutdown();
 
-            // 그래픽 & 사운드 로딩
             raylib::Texture2D LoadTexture(const std::string& assetPath, unsigned int fallbackId = 0);
             raylib::Wave      LoadWave(const std::string& assetPath, unsigned int fallbackId = 0);
             raylib::Sound     LoadSound(const std::string& assetPath, unsigned int fallbackId = 0);
             raylib::Music     LoadMusic(const std::string& assetPath, unsigned int fallbackId = 0);
             std::string       LoadText(const std::string& assetPath, unsigned int fallbackId = 0);
 
-            // 기본 폰트 로드
             raylib::Font                  LoadFont(const std::string& assetPath, unsigned int fallbackId = 0);
             std::shared_ptr<raylib::Font> LoadFontShared(const std::string& assetPath, unsigned int fallbackId = 0);
 
-            // 한글/확장 코드포인트용 폰트 로드 (GameOverScene 한글 깨짐 대응)
             std::shared_ptr<raylib::Font> LoadFontExShared(
                 const std::string& assetPath,
                 int fontSize,

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 #include "raylib-cpp.hpp"
 #include "Engine/Engine.hpp"
 
@@ -16,6 +17,5 @@ public:
 
 private:
     Engine::UI::ClickableAreaManager clickManager_;
-
     std::shared_ptr<raylib::Font> nanumBoldFont_;
 };

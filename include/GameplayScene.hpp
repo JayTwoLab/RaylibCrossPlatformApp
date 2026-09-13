@@ -12,6 +12,7 @@ public:
     void Init() override;
     void Update() override;
     void Draw() override;
+    void DrawImGui() override;
     void Unload() override;
     std::string GetNextScene() override;
 
@@ -24,8 +25,8 @@ private:
     Engine::Graphics::RotatingSprite playerSprite_;
     Engine::Graphics::RotatingSprite floatingEffect_;
 
-    int playerHp_;
-    int score_;
+    int playerHp_{ 100 };
+    int score_{ 0 };
 
     void ResetFields();
 };

@@ -7,6 +7,22 @@
 
 #include "Engine/Resource/ResourceManager.hpp"
 
+// Platform identification
+#if defined(_WIN32)
+#define PLATFORM_WINDOWS
+#elif defined(__ANDROID__)
+#define PLATFORM_ANDROID
+#elif defined(__APPLE__)
+#include <TargetConditionals.h>
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#define PLATFORM_IOS
+#else
+#define PLATFORM_MACOS
+#endif
+#elif defined(__linux__)
+#define PLATFORM_LINUX
+#endif
+
 namespace Engine {
     namespace Resource {
 
@@ -40,17 +56,34 @@ namespace Engine {
         bool ResourceManager::Init() {
 #if defined(USE_RRES)
             if (resourcePath.empty()) {
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
                 resourcePath = "assets.rres";
+#elif defined(PLATFORM_MACOS)
+                // macOS app bundle: check Contents/Resources first, fallback to executable directory
+                std::filesystem::path bundleRes = std::filesystem::path(::GetApplicationDirectory()) / "Contents" / "Resources" / "assets.rres";
+                if (std::filesystem::exists(bundleRes)) {
+                    resourcePath = bundleRes;
+                }
+                else {
+                    resourcePath = std::filesystem::path(::GetApplicationDirectory()) / "assets.rres";
+                }
+#elif defined(PLATFORM_IOS) || defined(PLATFORM_ANDROID)
+                // Sandboxed mobile environments require the application directory prefix
+                resourcePath = std::filesystem::path(::GetApplicationDirectory()) / "assets.rres";
+#else
+                resourcePath = "assets.rres";
+#endif
             }
+
             std::string pkgStr = resourcePath.string();
             centralDir_ = rresLoadCentralDirectory(pkgStr.c_str());
             isInitialized_ = (centralDir_.count > 0);
 
             if (!isInitialized_) {
-                TraceLog(LOG_ERROR, "RRES: [%s] Central Directory 로드 실패", pkgStr.c_str());
+                TraceLog(LOG_ERROR, "RRES: Failed to load Central Directory from [%s]", pkgStr.c_str());
                 return false;
             }
-            TraceLog(LOG_INFO, "RRES: 패키지 로드 완료 (%u entries)", centralDir_.count);
+            TraceLog(LOG_INFO, "RRES: Package loaded successfully (%u entries)", centralDir_.count);
             return true;
 #else
             isInitialized_ = true;
@@ -69,10 +102,28 @@ namespace Engine {
         }
 
         std::string ResourceManager::ResolveDiskPath(const std::string& assetPath) const {
-            if (resourcePath.empty()) return assetPath;
+            if (assetPath.empty()) return {};
+
             std::filesystem::path p(assetPath);
             if (p.is_absolute()) return assetPath;
-            return (resourcePath / p).lexically_normal().string();
+
+            std::filesystem::path basePath = resourcePath;
+
+            // When no custom base path is specified, use platform-native asset directory
+            if (basePath.empty()) {
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
+                basePath = std::filesystem::current_path();
+#elif defined(PLATFORM_MACOS)
+                std::filesystem::path bundleRes = std::filesystem::path(::GetApplicationDirectory()) / "Contents" / "Resources";
+                basePath = std::filesystem::exists(bundleRes) ? bundleRes : std::filesystem::path(::GetApplicationDirectory());
+#elif defined(PLATFORM_IOS) || defined(PLATFORM_ANDROID)
+                basePath = std::filesystem::path(::GetApplicationDirectory());
+#else
+                basePath = std::filesystem::current_path();
+#endif
+            }
+
+            return (basePath / p).lexically_normal().string();
         }
 
 #if defined(USE_RRES)
@@ -89,7 +140,7 @@ namespace Engine {
 #if defined(USE_RRES)
             unsigned int id = ResolveResourceId(assetPath, fallbackId);
             if (id == 0) {
-                TraceLog(LOG_WARNING, "RRES: 텍스처 에셋 ID를 찾을 수 없음: %s", assetPath.c_str());
+                TraceLog(LOG_WARNING, "RRES: Texture asset ID not found: %s", assetPath.c_str());
                 return raylib::Texture2D();
             }
 
@@ -98,7 +149,7 @@ namespace Engine {
             ::Image rawImg = LoadImageFromResource(chunk);
             rresUnloadResourceChunk(chunk);
 
-            // GPU 메모리로 업로드 후 CPU 원본 버퍼 즉시 해제
+            // Upload to GPU memory and immediately release CPU source buffer
             ::Texture2D rawTex = ::LoadTextureFromImage(rawImg);
             ::UnloadImage(rawImg);
             return raylib::Texture2D(rawTex);
@@ -147,7 +198,7 @@ namespace Engine {
             void* rawData = LoadDataFromResource(chunk, &dataSize);
             std::string ext = std::filesystem::path(assetPath).extension().string();
 
-            // 메모리 버퍼로부터 스트리밍 Music 로드
+            // Load streaming music from memory buffer
             ::Music rawMusic = ::LoadMusicStreamFromMemory(ext.c_str(), static_cast<const unsigned char*>(rawData), dataSize);
             rresUnloadResourceChunk(chunk);
             return raylib::Music(rawMusic);

@@ -6,10 +6,8 @@ namespace Engine {
     namespace Display {
         class Display {
         public:
-            // Access the singleton instance
             static Display& Instance();
 
-            // Non-copyable, non-movable
             Display(const Display&) = delete;
             Display& operator=(const Display&) = delete;
             Display(Display&&) = delete;
@@ -17,14 +15,12 @@ namespace Engine {
 
             int VirtualWidth;
             int VirtualHeight;
-             
+
             raylib::Vector2 GetVirtualMousePosition();
 
         private:
-            // Private ctor ensures only Instance() can create the object
             Display() : VirtualWidth(0), VirtualHeight(0) {}
             ~Display() = default;
         };
-
     } // namespace Display
 } // namespace Engine

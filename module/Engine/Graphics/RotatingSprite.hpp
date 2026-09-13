@@ -22,14 +22,14 @@ namespace Engine {
             SpriteClip* currentClip = nullptr;
             std::string currentClipKey = "";
 
-            raylib::Vector2 position;
-            float rotation;
-            float rotationSpeed;
-            float scale;
-            int zOrder;
+            raylib::Vector2 position{ 0.0f, 0.0f };
+            float rotation{ 0.0f };
+            float rotationSpeed{ 0.0f };
+            float scale{ 1.0f };
+            int zOrder{ 0 };
 
-            int currentFrame;
-            float frameTimer;
+            int currentFrame{ 0 };
+            float frameTimer{ 0.0f };
 
             std::function<void()> onClickCallback = nullptr;
 

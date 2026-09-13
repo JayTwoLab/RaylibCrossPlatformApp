@@ -1,6 +1,5 @@
-
-#include "raylib-cpp.hpp"
 #include "Engine/Scene/SceneManager.hpp"
+#include "raylib-cpp.hpp"
 
 namespace Engine {
     namespace Scene {
@@ -23,8 +22,7 @@ namespace Engine {
         }
 
         void SceneManager::Update() {
-            if (!currentScene_)
-                return;
+            if (!currentScene_) return;
 
             currentScene_->Update();
 
@@ -37,6 +35,12 @@ namespace Engine {
         void SceneManager::Draw() {
             if (currentScene_) {
                 currentScene_->Draw();
+            }
+        }
+
+        void SceneManager::DrawImGui() {
+            if (currentScene_) {
+                currentScene_->DrawImGui();
             }
         }
 

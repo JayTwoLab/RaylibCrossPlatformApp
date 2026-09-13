@@ -26,7 +26,6 @@ namespace Engine {
                 }
             }
 
-            // 디스크 모드와 rres 모드 모두 투명하게 지원
             raylib::Texture2D tex = Engine::Resource::ResourceManager::Instance().LoadTexture(filePath);
             if (tex.id <= 0) return false;
 
@@ -120,7 +119,7 @@ namespace Engine {
             return false;
         }
 
-        raylib::Rectangle  RotatingSprite::GetBounds() const {
+        raylib::Rectangle RotatingSprite::GetBounds() const {
             if (!currentClip) return { position.x, position.y, 0.0f, 0.0f };
             float w = currentClip->frameWidth * scale;
             float h = currentClip->frameHeight * scale;

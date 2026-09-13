@@ -9,21 +9,19 @@ void StageClearScene::Init() {
     clickManager_.Clear();
 
     clickManager_.AddRegion(
-        "back_to_title", raylib::Rectangle{ 330, 250, 140, 50 },
-        [this]() { this->nextScene_ = "Title"; });
-
+        "back_to_title", raylib::Rectangle{ 540, 400, 200, 60 },
+        [this]() { this->nextScene_ = "Title"; }
+    );
+    clickManager_.SetRegionText("back_to_title", "TITLE", raylib::Color::White(), raylib::Color::DarkBlue(), 24);
 }
 
 void StageClearScene::Update() {
     clickManager_.Update();
-} 
+}
 
 void StageClearScene::Draw() {
     raylib::Color::DarkGreen().ClearBackground();
-    raylib::DrawText("STAGE CLEAR!", 250, 150, 40, raylib::Color::Gold());
-
-    raylib::Rectangle(330, 250, 140, 50).Draw(raylib::Color::DarkBlue());
-    raylib::DrawText("TITLE", 370, 265, 20, raylib::Color::White());
+    raylib::DrawText("STAGE CLEAR!", 470, 250, 50, raylib::Color::Gold());
 
     clickManager_.Draw();
     clickManager_.DrawBoundary();

@@ -1,7 +1,5 @@
 #include <algorithm>
-#include "Engine/Scene/Scene.hpp"
-#include "Engine/Scene/SceneManager.hpp"
-#include "Engine/UI/ClickableAreaManager.hpp"
+#include <cmath>
 #include "Engine/Display/Display.hpp"
 
 namespace Engine {
@@ -17,33 +15,33 @@ namespace Engine {
 
             int screenWidth = GetScreenWidth();
             int screenHeight = GetScreenHeight();
-             
-			int VirtualWidth = Display::Instance().VirtualWidth;
-			int VirtualHeight = Display::Instance().VirtualHeight;
 
-            if (VirtualWidth <= 0 || VirtualHeight <= 0) {
+            int virtualWidth = Display::Instance().VirtualWidth;
+            int virtualHeight = Display::Instance().VirtualHeight;
+
+            if (virtualWidth <= 0 || virtualHeight <= 0) {
                 return { 0.0f, 0.0f };
             }
 
-            auto widthRatio = (float)screenWidth / (float)VirtualWidth;
-            auto heightRatio = (float)screenHeight / (float)VirtualHeight;
+            auto widthRatio = (float)screenWidth / (float)virtualWidth;
+            auto heightRatio = (float)screenHeight / (float)virtualHeight;
             float scale = std::min(widthRatio, heightRatio);
 
             if (scale <= 0.0f || !std::isfinite(scale)) {
                 return { 0.0f, 0.0f };
             }
 
-            float offsetX = (screenWidth  - (VirtualWidth  * scale)) * 0.5f;
-            float offsetY = (screenHeight - (VirtualHeight * scale)) * 0.5f;
+            float offsetX = (screenWidth - (virtualWidth * scale)) * 0.5f;
+            float offsetY = (screenHeight - (virtualHeight * scale)) * 0.5f;
 
             raylib::Vector2 virtualMouse = { 0.0f, 0.0f };
             virtualMouse.x = (mouse.x - offsetX) / scale;
             virtualMouse.y = (mouse.y - offsetY) / scale;
 
-            virtualMouse.x = std::clamp(virtualMouse.x, 0.0f, (float)VirtualWidth);
-            virtualMouse.y = std::clamp(virtualMouse.y, 0.0f, (float)VirtualHeight);
+            virtualMouse.x = std::clamp(virtualMouse.x, 0.0f, (float)virtualWidth);
+            virtualMouse.y = std::clamp(virtualMouse.y, 0.0f, (float)virtualHeight);
 
             return virtualMouse;
         }
-    }
-}
+    } // namespace Display
+} // namespace Engine

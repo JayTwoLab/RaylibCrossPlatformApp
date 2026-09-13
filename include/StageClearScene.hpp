@@ -6,7 +6,7 @@
 class StageClearScene : public Engine::Scene::Scene {
 public:
     StageClearScene();
-     
+
     void Init() override;
     void Update() override;
     void Draw() override;

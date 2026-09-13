@@ -2,6 +2,7 @@
 #include <filesystem>
 #include "raylib-cpp.hpp"
 #include "Engine/Engine.hpp"
+#include "Engine/UI/rlImGui.hpp"
 
 #include "TitleScene.hpp"
 #include "GameplayScene.hpp"
@@ -10,10 +11,8 @@
 
 int main(int argc, char** argv) {
 #ifdef NDEBUG
-    // Release 모드: 치명적 오류만 출력하거나 로깅 억제
     ::SetTraceLogLevel(LOG_FATAL);
 #else
-    // Debug 모드: 모든 로그 출력
     ::SetTraceLogLevel(LOG_ALL);
 #endif
 
@@ -22,79 +21,55 @@ int main(int argc, char** argv) {
     namespace EU = Engine::UI;
     namespace ER = Engine::Resource;
 
-    using EDD = ED::Display;
-    auto& display = EDD::Instance();
+    auto& display = ED::Display::Instance();
+    auto& resourceManager = ER::ResourceManager::Instance();
 
-    using ERR = ER::ResourceManager;
-    auto& resourceManager = ERR::Instance();
-
-    // =========================================================================
-    // 리소스 경로 설정 (USE_RRES 플래그 유무에 따른 자동 분기)
-    // =========================================================================
 #if defined(USE_RRES)
-    // rres 패키지 모드: 단일 아카이브 파일 경로 설정
-#ifdef NDEBUG
+#   ifdef NDEBUG
     ::ChangeDirectory(::GetApplicationDirectory());
     resourceManager.SetResourcePath("resources.rres");
-#else
+#   else
     auto currentPrjDir = CURRENT_PROJECT_DIR;
     std::filesystem::path pkgPath = std::filesystem::path(currentPrjDir) / "resources.rres";
     resourceManager.SetResourcePath(pkgPath);
-#endif
+#   endif
 #else
-    // 일반 디스크 모드: resources 폴더 경로 설정
-#ifdef NDEBUG
+#   ifdef NDEBUG
     ::ChangeDirectory(::GetApplicationDirectory());
     std::string resPathName = "resources";
     resourceManager.SetResourcePath(resPathName);
-#else
+#   else
     std::string resPathName = "resources";
     auto currentPrjDir = CURRENT_PROJECT_DIR;
     std::filesystem::path resPath = std::filesystem::path(currentPrjDir) / resPathName;
     resourceManager.SetResourcePath(resPath);
-#endif
+#   endif
 #endif
 
-    // 오디오 디바이스 초기화
     raylib::AudioDevice audioDevice;
     if (!::IsAudioDeviceReady()) {
-#ifdef __ANDROID__
-        TraceLog(LOG_ERROR, "Failed to initialize audio device on Android!");
-        TraceLog(LOG_WARNING, "Check microphone permissions in AndroidManifest.xml");
-#elif defined(_WIN32)
-        TraceLog(LOG_ERROR, "Failed to initialize audio device on Windows!");
-#elif defined(__APPLE__)
-        TraceLog(LOG_ERROR, "Failed to initialize audio device on macOS!");
-#else
-        TraceLog(LOG_ERROR, "Failed to initialize audio device!");
-#endif
+        TraceLog(LOG_ERROR, "Failed to initialize AudioDevice");
         return -1;
     }
-    auto masterVolume = 0.5f;
-    ::SetMasterVolume(masterVolume);
+    ::SetMasterVolume(0.5f);
 
-    // 가상 해상도 설정 (16:9 기준)
     display.VirtualWidth = 1280;
     display.VirtualHeight = 720;
 
     const int virtualScreenWidth = display.VirtualWidth;
     const int virtualScreenHeight = display.VirtualHeight;
 
-    unsigned int configFlags = FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT;
-    ::SetConfigFlags(configFlags);
+    ::SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
+    raylib::Window window(virtualScreenWidth, virtualScreenHeight, "Raylib-CPP Scalable App");
+    ::SetTargetFPS(60);
 
-    // 윈도우 생성
-    std::string windowName = "Raylib-CPP Scalable App";
-    raylib::Window window(virtualScreenWidth, virtualScreenHeight, windowName.c_str());
+    // 한글 폰트 설정
+    std::filesystem::path koreanFontDiskPath = resourceManager.GetResourcePath() / "NanumGothicBold.ttf";
+    EU::SetupImGui(koreanFontDiskPath.string(), 18.0f, true);
 
-    int framePerSecond = 60;
-    ::SetTargetFPS(framePerSecond);
-
-    // 가상 해상도 렌더 텍스처
     raylib::RenderTexture2D target(virtualScreenWidth, virtualScreenHeight);
     ::SetTextureFilter(target.GetTexture(), TEXTURE_FILTER_BILINEAR);
 
-    // 씬 매니저 초기화 및 씬 등록
     ES::SceneManager sceneManager;
     sceneManager.RegisterScene<TitleScene>("Title");
     sceneManager.RegisterScene<GameplayScene>("Gameplay");
@@ -103,7 +78,6 @@ int main(int argc, char** argv) {
 
     sceneManager.ChangeScene("Title");
 
-    // ESC 키로 즉시 종료되는 기본 동작 방지
     SetExitKey(KEY_NULL);
 
     // 메인 루프
@@ -111,22 +85,22 @@ int main(int argc, char** argv) {
         const int screenWidth = GetScreenWidth();
         const int screenHeight = GetScreenHeight();
 
-        // 화면 비율 계산 (레터박스 스케일링)
-        auto scaleX = static_cast<float>(screenWidth) / static_cast<float>(virtualScreenWidth);
-        auto scaleY = static_cast<float>(screenHeight) / static_cast<float>(virtualScreenHeight);
+        float scaleX = static_cast<float>(screenWidth) / static_cast<float>(virtualScreenWidth);
+        float scaleY = static_cast<float>(screenHeight) / static_cast<float>(virtualScreenHeight);
         float scale = std::min(scaleX, scaleY);
 
-        // [1] 씬 로직 업데이트
-        sceneManager.Update();
-
-        // [2] 가상 캔버스(RenderTexture)에 렌더링
         target.BeginMode();
         {
-            sceneManager.Draw();
+            EU::BeginImGui();
+            {
+                sceneManager.Update();
+                sceneManager.Draw();
+                sceneManager.DrawImGui();
+            }
+            EU::EndImGui();
         }
         target.EndMode();
 
-        // [3] 레터박스 적용 후 실제 윈도우 화면에 그리기
         window.BeginDrawing();
         {
             raylib::Color::Black().ClearBackground();
@@ -135,7 +109,7 @@ int main(int argc, char** argv) {
                 0.0f,
                 0.0f,
                 static_cast<float>(target.GetTexture().width),
-                -static_cast<float>(target.GetTexture().height) // OpenGL 좌표계 뒤집힘 보정
+                -static_cast<float>(target.GetTexture().height)
             };
 
             raylib::Rectangle destRect = {
@@ -145,13 +119,12 @@ int main(int argc, char** argv) {
                 virtualScreenHeight * scale
             };
 
-            auto origin_draw = raylib::Vector2{ 0, 0 };
-            auto rotation_draw = 0.0f;
-            auto tint_draw = raylib::Color::White();
-            target.GetTexture().Draw(srcRect, destRect, origin_draw, rotation_draw, tint_draw);
+            target.GetTexture().Draw(srcRect, destRect, { 0.0f, 0.0f }, 0.0f, raylib::Color::White());
         }
         window.EndDrawing();
     }
+
+    EU::ShutdownImGui();
 
     return 0;
 }

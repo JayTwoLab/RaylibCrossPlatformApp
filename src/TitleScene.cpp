@@ -11,71 +11,70 @@ void TitleScene::Init() {
     nextScene_ = "";
     clickManager_.Clear();
 
-    dragBox_ = { 100, 100, 120, 80 };
+    dragBox_ = { 150, 280, 160, 100 };
     isDragging_ = false;
 
-    // 1. 버튼 등록
+    // 게임 시작 버튼
     clickManager_.AddRegion(
-        "start_button", raylib::Rectangle{ 300, 180, 100, 42 },
+        "start_button", raylib::Rectangle{ 540, 320, 200, 60 },
         [this]() { this->nextScene_ = "Gameplay"; }
     );
 
-    // 2. 버튼용 스프라이트 생성 및 기본/클릭 이미지 등록
     auto buttonSprite = std::make_shared<Engine::Graphics::RotatingSprite>();
     buttonSprite->RegisterClip("idle", "button_normal.png");
     buttonSprite->RegisterClip("pressed", "button_clicked.png");
     buttonSprite->SetClipState("idle");
-
-    // 3. 영역에 스프라이트 바인딩
     clickManager_.SetRegionSprite("start_button", buttonSprite);
 
+    // 볼륨 조절 버튼
     clickManager_.AddRegion(
-        "vol_down", raylib::Rectangle{ 300, 250, 40, 40 },
+        "vol_down", raylib::Rectangle{ 510, 430, 50, 50 },
         [this]() {
-            if (soundVolume_ > 0.1f) {
+            if (soundVolume_ > 0.05f) {
                 soundVolume_ -= 0.1f;
+                if (soundVolume_ < 0.0f) soundVolume_ = 0.0f;
                 this->bgm_.SetVolume(soundVolume_);
                 this->sounds_["click"].Play();
             }
         }
     );
+    clickManager_.SetRegionText("vol_down", "-", raylib::Color::Black(), raylib::Color::LightGray(), 28);
 
     clickManager_.AddRegion(
-        "vol_up", raylib::Rectangle{ 460, 250, 40, 40 },
+        "vol_up", raylib::Rectangle{ 720, 430, 50, 50 },
         [this]() {
             if (soundVolume_ < 1.0f) {
                 soundVolume_ += 0.1f;
+                if (soundVolume_ > 1.0f) soundVolume_ = 1.0f;
                 this->bgm_.SetVolume(soundVolume_);
                 this->sounds_["click"].Play();
             }
         }
     );
+    clickManager_.SetRegionText("vol_up", "+", raylib::Color::Black(), raylib::Color::LightGray(), 28);
 
-    // 2. BGM 로드 (ResourceManager 경유)
     bgm_ = resourceManager.LoadMusic("background.mp3");
     soundVolume_ = 0.5f;
     bgm_.SetVolume(soundVolume_);
     bgm_.Play();
 
-    // 3. SFX 로드 (ResourceManager 경유)
-    sounds_.insert_or_assign(
-        "click",
-        resourceManager.LoadSound("click.wav")
-    );
-
+    sounds_.insert_or_assign("click", resourceManager.LoadSound("click.wav"));
     for (auto& snd : sounds_) {
         snd.second.SetVolume(1.0f);
     }
 }
 
 void TitleScene::Update() {
-    auto& display = Engine::Display::Display::Instance();
-
     bgm_.Update();
-
     clickManager_.Update();
 
-    raylib::Vector2 mousePos = display.GetVirtualMousePosition();
+    // ImGui가 마우스를 잡고 있지 않을 때만 드래그 상자 인터랙션
+    if (Engine::UI::WantCaptureMouse()) {
+        isDragging_ = false;
+        return; 
+    }
+
+    raylib::Vector2 mousePos = Engine::Display::Display::Instance().GetVirtualMousePosition();
 
     if (raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_LEFT)) {
         if (dragBox_.CheckCollision(mousePos)) {
@@ -94,30 +93,38 @@ void TitleScene::Update() {
     if (raylib::Mouse::IsButtonReleased(MOUSE_BUTTON_LEFT)) {
         isDragging_ = false;
     }
+ 
 }
 
 void TitleScene::Draw() {
     raylib::Color::RayWhite().ClearBackground();
-    raylib::DrawText("MAIN MENU", 320, 100, 32, raylib::Color::DarkBlue());
+    raylib::DrawText("MAIN MENU", 520, 180, 48, raylib::Color::DarkBlue());
 
     raylib::Color boxColor = isDragging_ ? raylib::Color::Orange() : raylib::Color::Purple();
     dragBox_.Draw(boxColor);
-    raylib::DrawText("Drag Me!", (int)dragBox_.x + 20, (int)dragBox_.y + 30, 20, raylib::Color::White());
+    raylib::DrawText("Drag Me!", static_cast<int>(dragBox_.x) + 30, static_cast<int>(dragBox_.y) + 38, 22, raylib::Color::White());
 
-    // raylib::Rectangle(300, 180, 200, 50).Draw(raylib::Color::SkyBlue());
-    // raylib::DrawText("START GAME", 335, 195, 20, raylib::Color::DarkBlue());
-
-    raylib::Rectangle(300, 250, 40, 40).Draw(raylib::Color::LightGray());
-    raylib::DrawText("-", 315, 258, 24, raylib::Color::Black());
-
-    auto volume_percent = static_cast<int>(soundVolume_ * 100);
-    raylib::DrawText(TextFormat("Volume: %d%%", volume_percent), 355, 260, 15, raylib::Color::DarkGray());
-
-    raylib::Rectangle(460, 250, 40, 40).Draw(raylib::Color::LightGray());
-    raylib::DrawText("+", 472, 258, 24, raylib::Color::Black());
+    auto volume_percent = static_cast<int>(soundVolume_ * 100.0f + 0.5f);
+    raylib::DrawText(TextFormat("Volume: %d%%", volume_percent), 580, 442, 20, raylib::Color::DarkGray());
 
     clickManager_.Draw();
     clickManager_.DrawBoundary();
+}
+
+void TitleScene::DrawImGui() {
+    ImGui::Begin("Title Debugger 한글");
+    {
+        ImGui::Text("Set Background Music Volume 한글");
+
+        if (ImGui::SliderFloat("Volume 볼륨", &soundVolume_, 0.0f, 1.0f, "%.2f")) {
+            bgm_.SetVolume(soundVolume_);
+        }
+
+        if (ImGui::Button("Start Game 게임")) {
+            nextScene_ = "Gameplay";
+        }
+    }
+    ImGui::End();
 }
 
 void TitleScene::Unload() {
