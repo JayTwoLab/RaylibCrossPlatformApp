@@ -17,5 +17,5 @@ public:
 
 private:
     Engine::UI::ClickableAreaManager clickManager_;
-    std::shared_ptr<raylib::Font> nanumBoldFont_;
+
 };

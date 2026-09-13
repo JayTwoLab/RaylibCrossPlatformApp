@@ -3,54 +3,44 @@
 
 GameOverScene::GameOverScene() {
     nextScene_ = "";
-    nanumBoldFont_ = nullptr;
 }
 
 void GameOverScene::Init() {
     nextScene_ = "";
     clickManager_.Clear();
 
-    // 1. 재시도 버튼
-    clickManager_.AddRegion(
-        "retry_button", raylib::Rectangle{ 480, 360, 140, 50 },
-        [this]() { this->nextScene_ = "Gameplay"; }
-    );
+    {
+        // 재시도 버튼
+        auto retry_button_name = "retry_button";
+        clickManager_.AddRegion(
+            retry_button_name, raylib::Rectangle{ 480, 360, 140, 50 },
+            [this]() { this->nextScene_ = "Gameplay"; }
+        );
 
-    auto sprite = std::make_shared<Engine::Graphics::RotatingSprite>();
-    sprite->RegisterClip("backchar", "back_char.png");
-    sprite->SetClipState("backchar");
-    sprite->SetRotationSpeed(180.0f);
-    clickManager_.SetRegionSprite("retry_button", sprite);
-
-    // 2. 타이틀 버튼
-    clickManager_.AddRegion(
-        "title_button", raylib::Rectangle{ 660, 360, 140, 50 },
-        [this]() { this->nextScene_ = "Title"; }
-    );
-
-    // 3. 한글 폰트 로드
-    std::vector<int> codepoints;
-    codepoints.reserve(95 + 11172);
-    for (int i = 32; i <= 126; ++i) {
-        codepoints.push_back(i);
-    }
-    for (int i = 0xAC00; i <= 0xD7A3; ++i) {
-        codepoints.push_back(i);
+        auto sprite = std::make_shared<Engine::Graphics::RotatingSprite>();
+        sprite->RegisterClip("backchar", "back_char.png");
+        sprite->SetClipState("backchar");
+        sprite->SetRotationSpeed(180.0f);
+        clickManager_.SetRegionSprite(retry_button_name, sprite);
     }
 
-    nanumBoldFont_ = Engine::Resource::ResourceManager::Instance().LoadFontExShared(
-        "NanumGothicBold.ttf", 32, codepoints
-    );
+    {
+        // 타이틀 버튼
+        auto title_button_name = "title_button";
+        clickManager_.AddRegion(
+            title_button_name, raylib::Rectangle{ 660, 360, 140, 50 },
+            [this]() { this->nextScene_ = "Title"; }
+        );
 
-    assert(nanumBoldFont_ != nullptr);
-    clickManager_.SetRegionText(
-        "title_button",
-        "To Title",
-        nanumBoldFont_,
-        raylib::Color::White(),
-        raylib::Color::DarkGray(),
-        22
-    );
+        clickManager_.SetRegionText(
+            title_button_name,
+            "To Title",
+            raylib::Color::White(),
+            raylib::Color::DarkGray(),
+            22
+        );
+    }
+
 }
 
 void GameOverScene::Update() {
@@ -59,14 +49,19 @@ void GameOverScene::Update() {
 
 void GameOverScene::Draw() {
     raylib::Color::Maroon().ClearBackground();
-    raylib::DrawText("GAME OVER", 500, 240, 50, raylib::Color::White());
-    clickManager_.Draw();
-    clickManager_.DrawBoundary();
+
+    {
+        raylib::DrawText("GAME OVER", 500, 240, 50, raylib::Color::White());
+    }
+
+    {
+        clickManager_.Draw();
+        clickManager_.DrawBoundary();
+    }
 }
 
 void GameOverScene::Unload() {
     clickManager_.Clear();
-    nanumBoldFont_.reset();
 }
 
 std::string GameOverScene::GetNextScene() {
