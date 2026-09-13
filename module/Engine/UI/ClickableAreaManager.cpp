@@ -1,10 +1,33 @@
 #include "Engine/UI/ClickableAreaManager.hpp"
 #include "Engine/UI/rlImGui.hpp"
 #include "Engine/Display/Display.hpp"
+#include "Engine/Resource/ResourceManager.hpp"
 #include <algorithm>
 
 namespace Engine {
     namespace UI {
+
+        std::vector<int> ClickableAreaManager::GetKoreanCodePoints() {
+            std::vector<int> codepoints;
+            codepoints.reserve(95 + 11172);
+            for (int i = 32; i <= 126; ++i) {
+                codepoints.push_back(i);
+            }
+            for (int i = 0xAC00; i <= 0xD7A3; ++i) {
+                codepoints.push_back(i);
+            }
+            return codepoints;
+        }
+
+        std::shared_ptr<raylib::Font> ClickableAreaManager::LoadFontHelper(const std::filesystem::path& fontPath, int fontSize, const std::vector<int>& codepoints) {
+            if (fontPath.empty()) return nullptr;
+
+            auto& rm = Engine::Resource::ResourceManager::Instance();
+            if (fontSize > 0) {
+                return rm.LoadFontExShared(fontPath.string(), fontSize, codepoints);
+            }
+            return rm.LoadFontShared(fontPath.string());
+        }
 
         ClickableRegion* ClickableAreaManager::FindRegionById(const std::string& id) {
             for (auto& region : regions) {
@@ -124,6 +147,30 @@ namespace Engine {
             }
         }
 
+        void ClickableAreaManager::SetDefaultFont(std::shared_ptr<raylib::Font> font) {
+            defaultFont_ = font;
+        }
+
+        void ClickableAreaManager::SetDefaultFont(const std::filesystem::path& fontPath, int fontSize, const std::vector<int>& codepoints) {
+            defaultFont_ = LoadFontHelper(fontPath, fontSize, codepoints);
+        }
+
+        void ClickableAreaManager::SetRegionFont(const std::string& id, std::shared_ptr<raylib::Font> font) {
+            ClickableRegion* region = FindRegionById(id);
+            if (region) {
+                region->font = font;
+                region->useCustomFont = (font != nullptr);
+            }
+        }
+
+        void ClickableAreaManager::SetRegionFont(const std::string& id, const std::filesystem::path& fontPath, int fontSize, const std::vector<int>& codepoints) {
+            ClickableRegion* region = FindRegionById(id);
+            if (region) {
+                region->font = LoadFontHelper(fontPath, fontSize, codepoints);
+                region->useCustomFont = (region->font != nullptr);
+            }
+        }
+
         void ClickableAreaManager::SetRegionText(const std::string& id, const std::string& text, const raylib::Color& color, int fontSize) {
             ClickableRegion* region = FindRegionById(id);
             if (region) {
@@ -155,7 +202,7 @@ namespace Engine {
                 region->textColor = color;
                 region->fontSize = fontSize;
                 region->hasBackground = false;
-                region->useCustomFont = true;
+                region->useCustomFont = (font != nullptr);
             }
         }
 
@@ -168,7 +215,32 @@ namespace Engine {
                 region->backgroundColor = backgroundColor;
                 region->fontSize = fontSize;
                 region->hasBackground = true;
-                region->useCustomFont = true;
+                region->useCustomFont = (font != nullptr);
+            }
+        }
+
+        void ClickableAreaManager::SetRegionText(const std::string& id, const std::string& text, const std::filesystem::path& fontPath, const raylib::Color& color, int fontSize, const std::vector<int>& codepoints) {
+            ClickableRegion* region = FindRegionById(id);
+            if (region) {
+                region->text = text;
+                region->font = LoadFontHelper(fontPath, fontSize, codepoints);
+                region->textColor = color;
+                region->fontSize = fontSize;
+                region->hasBackground = false;
+                region->useCustomFont = (region->font != nullptr);
+            }
+        }
+
+        void ClickableAreaManager::SetRegionText(const std::string& id, const std::string& text, const std::filesystem::path& fontPath, const raylib::Color& color, const raylib::Color& backgroundColor, int fontSize, const std::vector<int>& codepoints) {
+            ClickableRegion* region = FindRegionById(id);
+            if (region) {
+                region->text = text;
+                region->font = LoadFontHelper(fontPath, fontSize, codepoints);
+                region->textColor = color;
+                region->backgroundColor = backgroundColor;
+                region->fontSize = fontSize;
+                region->hasBackground = true;
+                region->useCustomFont = (region->font != nullptr);
             }
         }
 
@@ -251,18 +323,20 @@ namespace Engine {
                         region.bounds.Draw(region.backgroundColor);
                     }
 
+                    std::shared_ptr<raylib::Font> activeFont = (region.useCustomFont && region.font) ? region.font : defaultFont_;
+
                     float textWidth = 0.0f;
                     float textHeight = static_cast<float>(region.fontSize);
 
-                    if (region.useCustomFont && region.font) {
-                        raylib::Vector2 textSize = region.font->MeasureText(region.text.c_str(), static_cast<float>(region.fontSize), 1.0f);
+                    if (activeFont) {
+                        raylib::Vector2 textSize = activeFont->MeasureText(region.text.c_str(), static_cast<float>(region.fontSize), 1.0f);
                         textWidth = textSize.x;
                         textHeight = textSize.y;
 
                         float textX = region.bounds.x + (region.bounds.width - textWidth) * 0.5f;
                         float textY = region.bounds.y + (region.bounds.height - textHeight) * 0.5f;
 
-                        region.font->DrawText(region.text.c_str(), raylib::Vector2{ textX, textY }, static_cast<float>(region.fontSize), 1.0f, region.textColor);
+                        activeFont->DrawText(region.text.c_str(), raylib::Vector2{ textX, textY }, static_cast<float>(region.fontSize), 1.0f, region.textColor);
                     }
                     else {
                         textWidth = static_cast<float>(raylib::MeasureText(region.text.c_str(), region.fontSize));

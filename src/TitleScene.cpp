@@ -5,7 +5,11 @@ TitleScene::TitleScene() {
 }
 
 void TitleScene::Init() {
+    namespace ED = Engine::Display;
+    namespace ES = Engine::Scene;
+    namespace EU = Engine::UI;
     namespace ER = Engine::Resource;
+
     auto& resourceManager = ER::ResourceManager::Instance();
 
     nextScene_ = "";
@@ -13,6 +17,9 @@ void TitleScene::Init() {
 
     dragBox_ = { 150, 280, 160, 100 };
     isDragging_ = false;
+
+    std::filesystem::path koreanFontDiskPath = resourceManager.GetResourcePath() / "NanumGothicBold.ttf";
+    clickManager_.SetDefaultFont(koreanFontDiskPath, 20, EU::ClickableAreaManager::GetKoreanCodePoints());
 
     // 게임 시작 버튼
     clickManager_.AddRegion(
@@ -38,7 +45,7 @@ void TitleScene::Init() {
             }
         }
     );
-    clickManager_.SetRegionText("vol_down", "-", raylib::Color::Black(), raylib::Color::LightGray(), 28);
+    clickManager_.SetRegionText("vol_down", "음", raylib::Color::Black(), raylib::Color::LightGray(), 28);
 
     clickManager_.AddRegion(
         "vol_up", raylib::Rectangle{ 720, 430, 50, 50 },
@@ -51,7 +58,7 @@ void TitleScene::Init() {
             }
         }
     );
-    clickManager_.SetRegionText("vol_up", "+", raylib::Color::Black(), raylib::Color::LightGray(), 28);
+    clickManager_.SetRegionText("vol_up", "양", raylib::Color::Black(), raylib::Color::LightGray(), 28);
 
     bgm_ = resourceManager.LoadMusic("background.mp3");
     soundVolume_ = 0.5f;
