@@ -81,16 +81,22 @@ void GameplayScene::Update() {
     clickManager_.Update();
 
     // ImGui 점유 시 게임 오브젝트 클릭 방지
-    if (!Engine::UI::WantCaptureMouse() && raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_LEFT)) {
+    if (!Engine::UI::WantCaptureMouse() &&
+        raylib::Mouse::IsButtonPressed(MOUSE_BUTTON_LEFT))
+    {
         raylib::Vector2 mousePos = Engine::Display::Display::Instance().GetVirtualMousePosition();
         for (auto it = renderList_.rbegin(); it != renderList_.rend(); ++it) {
             if ((*it)->GetBounds().CheckCollision(mousePos)) {
-                if ((*it)->TriggerClick()) break;
+                if ((*it)->TriggerClick()) {
+                    break;
+                }
             }
         }
     }
 
-    for (auto* sprite : renderList_) sprite->Update();
+    for (auto* sprite : renderList_) {
+        sprite->Update();
+    }
 
     // ImGui 점유 시 키보드 이동 방지
     raylib::Vector2 pos = playerSprite_.GetPosition();
@@ -116,6 +122,7 @@ void GameplayScene::Update() {
         nextScene_ = "GameOver";
         return;
     }
+
     if (score_ >= 100) {
         nextScene_ = "StageClear";
         return;
